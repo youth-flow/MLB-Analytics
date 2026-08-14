@@ -2,7 +2,7 @@
   {
     "file": "data/raw/statcast_imai_2026.csv",
     "url": "https://baseballsavant.mlb.com/statcast_search/csv?all=true&hfPT=&hfAB=&hfBBT=&hfPR=&hfZ=&stadium=&hfBBL=&hfNewZones=&hfGT=R%7CPO%7CS%7C=&hfSea=&hfSit=&player_type=pitcher&hfOuts=&opponent=&pitcher_throws=&batter_stands=&hfSA=&game_date_gt=2026-03-29&game_date_lt=2026-08-12&pitchers_lookup%5B%5D=837227&team=&position=&hfRO=&home_road=&hfFlag=&metric_1=&hfInn=&min_pitches=0&min_results=0&group_by=name&sort_col=pitches&player_event_sort=h_launch_speed&sort_order=desc&min_abs=0&type=details&",
-    "retrieved_at_utc": "2026-08-14T02:53:43.614594+00:00",
+    "retrieved_at_utc": "2026-08-14T03:11:15.516916+00:00",
     "sha256": "1b37ea070d93270e753fafe6cbb17c4bba1e02572fdc89eb7725335f2968bf6c",
     "bytes": 846925,
     "content_type": "application/download; charset=utf-8",
@@ -11,7 +11,7 @@
   {
     "file": "data/raw/mlb_statsapi_game_log_2026.json",
     "url": "https://statsapi.mlb.com/api/v1/people/837227/stats?stats=gameLog&group=pitching&season=2026",
-    "retrieved_at_utc": "2026-08-14T02:53:45.682084+00:00",
+    "retrieved_at_utc": "2026-08-14T03:11:16.408256+00:00",
     "sha256": "71a4800e88cccca4b66f718a4614877d2f2e435a038a5e882b9d714b06bc8d74",
     "bytes": 29262,
     "content_type": "application/json;charset=UTF-8"
@@ -19,15 +19,47 @@
   {
     "file": "data/raw/npb_imai_player_page.html",
     "url": "https://npb.jp/bis/players/31335134.html",
-    "retrieved_at_utc": "2026-08-14T02:53:46.223988+00:00",
+    "retrieved_at_utc": "2026-08-14T03:11:17.032298+00:00",
     "sha256": "6e834d7c596437de47e9c6856909a5274d52eff6a5111a03a43d1ea77439786f",
     "bytes": 52283,
     "content_type": "text/html"
   },
   {
+    "file": "data/raw/savant_imai_player_page.html",
+    "url": "https://baseballsavant.mlb.com/savant-player/tatsuya-imai-837227",
+    "retrieved_at_utc": "2026-08-14T03:11:17.714631+00:00",
+    "sha256": "4e3cc4a58c313499c25ae87fc71e16fc51bfb97aad8bcf9774204804c256b848",
+    "bytes": 1482683,
+    "content_type": "text/html; charset=utf-8"
+  },
+  {
+    "file": "data/raw/mlb_imai_player_page.html",
+    "url": "https://www.mlb.com/player/tatsuya-imai-837227",
+    "retrieved_at_utc": "2026-08-14T03:11:18.931582+00:00",
+    "sha256": "fb149f003ab9158b9396316238e4b68fd34c07c626fbae3986367553e986e251",
+    "bytes": 502007,
+    "content_type": ""
+  },
+  {
+    "file": "data/raw/mlb_imai_adjustment_article_2026-05-31.html",
+    "url": "https://www.mlb.com/astros/news/tatsuya-imai-adjusting-to-pitching-in-major-leagues",
+    "retrieved_at_utc": "2026-08-14T03:11:20.092488+00:00",
+    "sha256": "bb31fe998cf760ec90dbd4e1239aa99bd30d452752519e42ae90cf8e4f9d1adb",
+    "bytes": 361363,
+    "content_type": ""
+  },
+  {
+    "file": "data/raw/mlb_imai_bullpen_article_2026-07-31.html",
+    "url": "https://www.mlb.com/astros/news/tatsuya-imai-moved-to-astros-bullpen",
+    "retrieved_at_utc": "2026-08-14T03:11:21.286912+00:00",
+    "sha256": "c4d559e960bb7b6a67208cd29b346921870395573d47cfdf1ff2063942464ff0",
+    "bytes": 365456,
+    "content_type": ""
+  },
+  {
     "file": "data/raw/savant_expected_stats_pitchers_2026.csv",
     "url": "https://baseballsavant.mlb.com/leaderboard/expected_statistics?type=pitcher&year=2026&position=&team=&filterType=pa&min=25&csv=true",
-    "retrieved_at_utc": "2026-08-14T02:53:46.648199+00:00",
+    "retrieved_at_utc": "2026-08-14T03:11:21.686339+00:00",
     "sha256": "c16e3750d24ff1f612ee8ed16469a8bf671c43eb0c281ead78f34d23f6c7d390",
     "bytes": 105771,
     "content_type": "text/csv; charset=utf-8",
@@ -36,7 +68,7 @@
   {
     "file": "data/raw/savant_pitch_arsenal_stats_2026.csv",
     "url": "https://baseballsavant.mlb.com/leaderboard/pitch-arsenal-stats?type=pitcher&pitchType=&year=2026&team=&min=1&csv=true",
-    "retrieved_at_utc": "2026-08-14T02:53:47.168684+00:00",
+    "retrieved_at_utc": "2026-08-14T03:11:22.225025+00:00",
     "sha256": "b5885043a07cd2c3c77f14171bf46626d0680703af397552d1a6c107da1b705a",
     "bytes": 443268,
     "content_type": "text/csv; charset=utf-8",
@@ -45,7 +77,7 @@
   {
     "file": "data/raw/savant_percentile_rankings_2026.csv",
     "url": "https://baseballsavant.mlb.com/leaderboard/percentile-rankings?type=pitcher&year=2026&position=&team=&csv=true",
-    "retrieved_at_utc": "2026-08-14T02:53:47.479682+00:00",
+    "retrieved_at_utc": "2026-08-14T03:11:22.543194+00:00",
     "sha256": "f51098ea811f9ac340f574304c25ba12abc8adbe307889b725c3c1fed885785c",
     "bytes": 46449,
     "content_type": "text/csv; charset=utf-8",
@@ -54,7 +86,7 @@
   {
     "file": "data/raw/savant_pitch_movement_ff_2026.csv",
     "url": "https://baseballsavant.mlb.com/leaderboard/pitch-movement?year=2026&team=&min=50&pitch_type=FF&hand=&x=pitcher_break_x_hidden&z=pitcher_break_z_hidden&csv=true",
-    "retrieved_at_utc": "2026-08-14T02:53:47.864876+00:00",
+    "retrieved_at_utc": "2026-08-14T03:11:22.965401+00:00",
     "sha256": "17711d8eb4c100d30f9dde4bb0fa842a6bcac5e36bf5c79f883ffd6650e1dd04",
     "bytes": 107105,
     "content_type": "text/csv; charset=utf-8",
@@ -63,10 +95,50 @@
   {
     "file": "data/raw/savant_pitch_movement_sl_2026.csv",
     "url": "https://baseballsavant.mlb.com/leaderboard/pitch-movement?year=2026&team=&min=50&pitch_type=SL&hand=&x=pitcher_break_x_hidden&z=pitcher_break_z_hidden&csv=true",
-    "retrieved_at_utc": "2026-08-14T02:53:48.222326+00:00",
+    "retrieved_at_utc": "2026-08-14T03:11:23.311307+00:00",
     "sha256": "5078e518c5c3a02359bd7b4b743a41de285d97ab9f2897c9d9d21927031ba0b8",
     "bytes": 65662,
     "content_type": "text/csv; charset=utf-8",
     "rows_excluding_header": 336
+  },
+  {
+    "file": "data/raw/npb_basement_home.html",
+    "url": "https://npbbasement.com/",
+    "retrieved_at_utc": "2026-08-14T03:11:23.764995+00:00",
+    "sha256": "c0e37644b4b7bf3b073e5d1d3dc8913a14c32ca2dd0a47068dd7e864c7c9adac",
+    "bytes": 2289,
+    "content_type": "text/html; charset=utf-8"
+  },
+  {
+    "file": "data/raw/npb_basement_app.js",
+    "url": "https://npbbasement.com/assets/index-_q0fINED.js",
+    "retrieved_at_utc": "2026-08-14T03:11:24.813138+00:00",
+    "sha256": "52eef22afead8e193c46f852ffc7fdfdb99ed49524de77305e0c9ba7ba8e7318",
+    "bytes": 1822527,
+    "content_type": "text/javascript; charset=utf-8, text/javascript; charset=utf-8"
+  },
+  {
+    "file": "data/raw/npb_basement_2023_1g.js",
+    "url": "https://npbbasement.com/assets/2023_1g-kGTtae0d.js",
+    "retrieved_at_utc": "2026-08-14T03:11:25.709129+00:00",
+    "sha256": "86a86bee680474311afd50d35c02d2cbadb8a68f2199f081ceca2ee2ce2f4b75",
+    "bytes": 1388497,
+    "content_type": "text/javascript; charset=utf-8, text/javascript; charset=utf-8"
+  },
+  {
+    "file": "data/raw/npb_basement_2024_1g.js",
+    "url": "https://npbbasement.com/assets/2024_1g-DvSNzTh2.js",
+    "retrieved_at_utc": "2026-08-14T03:11:26.641269+00:00",
+    "sha256": "65af31f4ea98f0fe52907936027a8d764b5d4bfc2914490c3f58281f89880195",
+    "bytes": 1422936,
+    "content_type": "text/javascript; charset=utf-8, text/javascript; charset=utf-8"
+  },
+  {
+    "file": "data/raw/npb_basement_2025_1g.js",
+    "url": "https://npbbasement.com/assets/2025_1g-D3_GvzA7.js",
+    "retrieved_at_utc": "2026-08-14T03:11:28.557630+00:00",
+    "sha256": "8edef87deafac544bab6d630fbbf5f0c84a2e2709c222264489d48fc40beedcb",
+    "bytes": 1467573,
+    "content_type": "text/javascript; charset=utf-8, text/javascript; charset=utf-8"
   }
 ]
