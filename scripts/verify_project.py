@@ -80,6 +80,8 @@ ARTIFACT_FILES = (
 )
 EXCLUDED_PARTS = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache", "rendered"}
 EXCLUDED_SUFFIXES = {".pyc", ".pyo"}
+CANONICAL_TEXT_SUFFIXES = {".csv", ".json", ".md", ".py", ".txt", ".toml", ".yml", ".yaml"}
+CANONICAL_TEXT_NAMES = {".gitattributes", ".gitignore", ".python-version"}
 
 PUBLIC_SCAN_DIRS = ("config", "docs", "reports/sources", "reports/public", "scripts", "tests", ".github")
 PUBLIC_SCAN_FILES = ("README.md", "data/README.md", "pyproject.toml")
@@ -117,10 +119,13 @@ def stable_zip_sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def artifact_digest(path: Path) -> tuple[str, str]:
+def artifact_digest(path: Path) -> tuple[str, str, int]:
     if path.suffix.lower() == ".docx":
-        return "zip-content-sha256-v1", stable_zip_sha256(path)
-    return "file-sha256-v1", sha256(path)
+        return "zip-content-sha256-v1", stable_zip_sha256(path), path.stat().st_size
+    if path.suffix.lower() in CANONICAL_TEXT_SUFFIXES or path.name in CANONICAL_TEXT_NAMES:
+        payload = path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+        return "text-lf-sha256-v1", hashlib.sha256(payload).hexdigest(), len(payload)
+    return "file-sha256-v1", sha256(path), path.stat().st_size
 
 
 def _safe_manifest_path(root: Path, relative: str) -> Path | None:
@@ -456,11 +461,11 @@ def collect_artifacts(root: Path = ROOT) -> list[Path]:
 def build_artifact_manifest_bytes(root: Path = ROOT) -> tuple[bytes, list[dict[str, str | int]]]:
     rows: list[dict[str, str | int]] = []
     for path in collect_artifacts(root):
-        digest_kind, digest = artifact_digest(path)
+        digest_kind, digest, canonical_bytes = artifact_digest(path)
         rows.append(
             {
                 "file": path.relative_to(root).as_posix(),
-                "bytes": path.stat().st_size,
+                "bytes": canonical_bytes,
                 "digest_kind": digest_kind,
                 "sha256": digest,
             }
@@ -566,7 +571,7 @@ def read_manual_visual_receipt(root: Path = ROOT) -> dict:
     }
 
 
-def run_checks(root: Path = ROOT) -> dict:
+def run_checks(root: Path = ROOT, *, include_visual: bool = False) -> dict:
     analysis_config = json.loads((root / "config" / "analysis.json").read_text(encoding="utf-8"))
     source_manifest = check_source_manifest(root)
     reconciliation = check_data_reconciliation(root)
@@ -591,8 +596,19 @@ def run_checks(root: Path = ROOT) -> dict:
         "artifact_manifest": artifacts,
     }
     automatic_pass = all(check.get("status") == "passed" for check in automatic.values())
-    rendered = inspect_rendered_pdfs(root)
-    manual = read_manual_visual_receipt(root)
+    if include_visual:
+        rendered = inspect_rendered_pdfs(root)
+        manual = read_manual_visual_receipt(root)
+    else:
+        rendered = {
+            "status": "not_run",
+            "documents": {},
+            "note": "Default automatic verification does not inspect local render caches.",
+        }
+        manual = {
+            "status": "not_run",
+            "note": "Run with --require-visual to evaluate local render evidence and a human receipt.",
+        }
     submission_ready = automatic_pass and rendered["status"] == "passed" and manual["status"] == "reviewed"
     return {
         "report_schema_version": 2,
@@ -626,9 +642,13 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     QA.mkdir(parents=True, exist_ok=True)
-    checks = run_checks(ROOT)
-    output = QA / "integrity_report.json"
-    output.write_text(json.dumps(checks, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    checks = run_checks(ROOT, include_visual=args.require_visual)
+    output = QA / ("local_visual_report.json" if args.require_visual else "integrity_report.json")
+    output.write_text(
+        json.dumps(checks, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
     print(json.dumps(checks, ensure_ascii=False, indent=2))
     success = bool(checks["overall_pass"])
     if args.require_visual:

@@ -90,7 +90,6 @@ python scripts/verify_project.py
 - raw 快照与 source manifest 的 SHA-256 一致性；
 - Statcast 与官方比赛日志的数据闭合；
 - DOCX 的 A4 结构、关键标题和所需样式；
-- 已存在 PDF 的页数读取；
 - 研究交付物 manifest 的重建。
 
 GitHub Actions 在 Windows/Python 3.12 上运行相同的冻结离线流水线与回归测试，不执行联网刷新。
@@ -108,6 +107,14 @@ DOCX 的分页由实际文字处理软件决定。最终交付前应在目标环
 参考环境使用 Microsoft Word 导出 PDF、Poppler `pdftoppm` 生成逐页 PNG。LibreOffice 可作为跨平台替代，但分页结果可能不同，必须重新人工审阅。
 
 人工视觉结论不是可以由布尔常量替代的自动检测；应记录审阅日期、软件版本、检查页数和审阅者，并与自动完整性结果分开保存。`qa/rendered/` 属于可再生本地中间物，默认不进入 Git。
+
+默认 `verify_project.py` 有意不读取这些本地缓存，以保证 clean clone 的 `qa/integrity_report.json` 可确定性重建。准备好两份 PDF 和人工审阅收据 `qa/visual_review_receipt.json` 后，可运行：
+
+```powershell
+python scripts/verify_project.py --require-visual
+```
+
+该模式检查正式稿 2 页、完整底稿 7 页，并把本机结果写入被忽略的 `qa/local_visual_report.json`；它不会把“无截断、无重叠”等人工判断伪装成自动结论。
 
 ## 推断边界
 

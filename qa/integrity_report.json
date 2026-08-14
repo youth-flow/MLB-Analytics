@@ -121,32 +121,20 @@
     "artifact_manifest": {
       "status": "passed",
       "entries": 45,
-      "manifest_sha256": "75c05f42be26993de012f99221f7dda110c1587d1a3fd5bf9593906818b93210",
+      "manifest_sha256": "14ef71cbfdf61b7b340aab353d3ea36e879fa57c967cc7de50be58d48145eb48",
       "excluded_path_leaks": [],
       "deterministic_order": true
     },
     "overall_pass": true
   },
   "render_verification": {
-    "status": "passed",
-    "documents": {
-      "formal": {
-        "status": "passed",
-        "rendered_pages": 2,
-        "expected_pages": 2,
-        "page_count_ok": true
-      },
-      "full_draft": {
-        "status": "passed",
-        "rendered_pages": 7,
-        "expected_pages": 7,
-        "page_count_ok": true
-      }
-    }
+    "status": "not_run",
+    "documents": {},
+    "note": "Default automatic verification does not inspect local render caches."
   },
   "manual_visual_qa": {
     "status": "not_run",
-    "note": "No human visual-review receipt is present in this checkout."
+    "note": "Run with --require-visual to evaluate local render evidence and a human receipt."
   },
   "overall_pass": true,
   "submission_ready": false,

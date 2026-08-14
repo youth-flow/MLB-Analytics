@@ -48,10 +48,12 @@ class VerificationMechanismTests(unittest.TestCase):
             (root / "scripts" / "__pycache__" / "ignored.pyc").write_bytes(b"cache")
             (root / "qa" / "rendered" / "ignored.pdf").write_bytes(b"render")
             first, rows = build_artifact_manifest_bytes(root)
+            (root / "scripts" / "kept.py").write_bytes(b"print('ok')\r\n")
             second, _ = build_artifact_manifest_bytes(root)
             self.assertEqual(first, second)
             paths = [row["file"] for row in rows]
             self.assertEqual(paths, ["scripts/kept.py"])
+            self.assertEqual(rows[0]["digest_kind"], "text-lf-sha256-v1")
             out = root / "qa" / "artifact_manifest.csv"
             receipt = write_artifact_manifest(root, out)
             first_hash = hashlib.sha256(out.read_bytes()).hexdigest()

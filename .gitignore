@@ -24,6 +24,7 @@ dist/
 # Local document-rendering intermediates
 qa/rendered/
 qa/tmp/
+qa/local_visual_report.json
 ~$*.docx
 
 # Submission-only personalized reports

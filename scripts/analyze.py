@@ -50,6 +50,12 @@ PITCH_NAMES = {"FF": "四缝线", "SL": "滑球", "CH": "变速球", "FS": "指�
 ORDER = ["FF", "SL", "CH", "FS", "SI", "CU"]
 
 
+def write_csv(frame: pd.DataFrame, path: Path) -> None:
+    """Write UTF-8-BOM CSV with platform-independent LF line endings."""
+    with path.open("w", encoding="utf-8-sig", newline="") as handle:
+        frame.to_csv(handle, index=False, lineterminator="\n")
+
+
 def innings_to_outs(value: object) -> int:
     text = str(value)
     if "." in text:
@@ -114,11 +120,7 @@ def parse_game_log() -> pd.DataFrame:
         )
     frame = pd.DataFrame(rows).sort_values("game_date")
     frame = frame[frame["game_date"].between(START_DATE, END_DATE)].copy()
-    frame.to_csv(
-        PROCESSED / f"mlb_game_log_{MLB_SEASON}.csv",
-        index=False,
-        encoding="utf-8-sig",
-    )
+    write_csv(frame, PROCESSED / f"mlb_game_log_{MLB_SEASON}.csv")
     return frame
 
 
@@ -325,7 +327,7 @@ def main() -> None:
     for role, group in pitches.groupby("role"):
         role_rows.append({"role": role, **rate_record(group, int((game_log["role"] == role).sum()))})
     role_summary = pd.DataFrame(role_rows)
-    role_summary.to_csv(PROCESSED / "mlb_process_metrics_by_role.csv", index=False, encoding="utf-8-sig")
+    write_csv(role_summary, PROCESSED / "mlb_process_metrics_by_role.csv")
 
     arsenal = pd.read_csv(RAW / f"savant_pitch_arsenal_stats_{MLB_SEASON}.csv")
     arsenal = arsenal[arsenal["player_id"] == PITCHER_ID].set_index("pitch_type")
@@ -352,7 +354,7 @@ def main() -> None:
             }
         )
     pitch_summary = pd.DataFrame(pitch_rows).sort_values("pitches", ascending=False)
-    pitch_summary.to_csv(PROCESSED / "mlb_pitch_type_summary.csv", index=False, encoding="utf-8-sig")
+    write_csv(pitch_summary, PROCESSED / "mlb_pitch_type_summary.csv")
 
     platoon_rows = []
     for (pitch_type, stand), group in pitches.groupby(["pitch_type", "stand"]):
@@ -370,7 +372,7 @@ def main() -> None:
             }
         )
     platoon = pd.DataFrame(platoon_rows)
-    platoon.to_csv(PROCESSED / "mlb_pitch_metrics_by_batter_hand.csv", index=False, encoding="utf-8-sig")
+    write_csv(platoon, PROCESSED / "mlb_pitch_metrics_by_batter_hand.csv")
 
     count_rows = []
     for (count_group, pitch_type), group in pitches.groupby(["count_group", "pitch_type"]):
@@ -384,7 +386,7 @@ def main() -> None:
                 "rv100": 100 * group["delta_pitcher_run_exp"].sum() / len(group),
             }
         )
-    pd.DataFrame(count_rows).to_csv(PROCESSED / "mlb_pitch_metrics_by_count.csv", index=False, encoding="utf-8-sig")
+    write_csv(pd.DataFrame(count_rows), PROCESSED / "mlb_pitch_metrics_by_count.csv")
 
     tto_rows = []
     starters = pitches[pitches["role"] == "先发"]
@@ -398,7 +400,7 @@ def main() -> None:
                 "four_seam_velocity": group.loc[group["pitch_type"] == "FF", "release_speed"].mean(),
             }
         )
-    pd.DataFrame(tto_rows).to_csv(PROCESSED / "mlb_times_through_order.csv", index=False, encoding="utf-8-sig")
+    write_csv(pd.DataFrame(tto_rows), PROCESSED / "mlb_times_through_order.csv")
 
     npb_advanced = pd.read_csv(
         PROCESSED / f"npb_basement_imai_advanced_pitching_{NPB_DETAIL_TAG}.csv"
@@ -432,10 +434,9 @@ def main() -> None:
             },
         ]
     )
-    outcomes.to_csv(
+    write_csv(
+        outcomes,
         PROCESSED / f"npb_{NPB_REFERENCE_YEAR}_vs_mlb_{MLB_SEASON}_outcomes.csv",
-        index=False,
-        encoding="utf-8-sig",
     )
 
     npb_pitch = pd.read_csv(PROCESSED / f"npb_basement_imai_pitch_values_{NPB_DETAIL_TAG}.csv")
@@ -459,10 +460,9 @@ def main() -> None:
             }
         )
     pitch_change = pd.DataFrame(change_rows)
-    pitch_change.to_csv(
+    write_csv(
+        pitch_change,
         PROCESSED / f"npb_{NPB_REFERENCE_YEAR}_vs_mlb_{MLB_SEASON}_pitch_mix.csv",
-        index=False,
-        encoding="utf-8-sig",
     )
 
     terminal = statcast_all[statcast_all["events"].notna()]
@@ -479,7 +479,7 @@ def main() -> None:
             {"check": "Games", "computed": int(pitches["game_pk"].nunique()), "reference": len(game_log), "difference": int(pitches["game_pk"].nunique()) - len(game_log)},
         ]
     )
-    reconciliation.to_csv(QA / "data_reconciliation.csv", index=False, encoding="utf-8-sig")
+    write_csv(reconciliation, QA / "data_reconciliation.csv")
     if not (reconciliation["difference"] == 0).all():
         raise ValueError("Data reconciliation failed")
 
@@ -519,7 +519,11 @@ def main() -> None:
         "relief_plate_appearances": int(role_index.loc["牛棚", "plate_appearances"]),
         "decision_thresholds": DECISION_THRESHOLDS,
     }
-    (PROCESSED / "analysis_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
+    (PROCESSED / "analysis_summary.json").write_text(
+        json.dumps(summary, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
 
     usage_low, usage_high = DECISION_THRESHOLDS["changeup_usage_pct_target"]
     velocity_gap_low, velocity_gap_high = DECISION_THRESHOLDS["changeup_velocity_gap_mph_target"]
@@ -552,7 +556,11 @@ def main() -> None:
 
 主要问题不是球速或三振能力，而是控球回退、对左打四缝线效果不佳，以及NPB时期有效变速球的使用与速度差消失。短期保留多局牛棚以恢复首球好球和好球区率；中期把变速球使用率带到 {usage_low:g}%—{usage_high:g}%、速度差带到 {velocity_gap_low:g}—{velocity_gap_high:g} mph；至少观察 {DECISION_THRESHOLDS['minimum_evaluation_plate_appearances']} 个打席，并以 Zone%≥{DECISION_THRESHOLDS['zone_pct_min']:g}%、首球好球率≥{DECISION_THRESHOLDS['first_pitch_strike_pct_min']:g}%、BB%≤{DECISION_THRESHOLDS['walk_pct_max']:g}%作为过程门槛，再进入 {workload_steps} 球负荷阶梯。
 """
-    (RESEARCH / "analysis_cycle_results.md").write_text(analysis_cycles, encoding="utf-8")
+    (RESEARCH / "analysis_cycle_results.md").write_text(
+        analysis_cycles,
+        encoding="utf-8",
+        newline="\n",
+    )
 
     make_core_figure(outcomes, pitch_change, pitch_summary)
     make_role_figure(role_summary, platoon)

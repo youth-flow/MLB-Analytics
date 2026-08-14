@@ -84,7 +84,7 @@ python -m unittest discover -s tests -v
 python scripts/verify_project.py
 ```
 
-文档页数与视觉检查需要先完成 DOCX→PDF→逐页图片渲染；平台差异和完整步骤见 [`docs/reproducibility.md`](docs/reproducibility.md)。
+默认流水线不读取本地渲染缓存，因而在 clean clone 中保持确定性。提交前的页数与视觉检查需另行完成 DOCX→PDF→逐页图片渲染，并运行 `python scripts/verify_project.py --require-visual`；平台差异和完整步骤见 [`docs/reproducibility.md`](docs/reproducibility.md)。
 
 ### 显式刷新联网数据
 

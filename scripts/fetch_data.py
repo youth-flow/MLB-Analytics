@@ -36,6 +36,12 @@ NPB_DETAIL_TAG = f"{min(NPB_BASEMENT_YEARS)}_{max(NPB_BASEMENT_YEARS)}"
 USER_AGENT = "Mozilla/5.0 (compatible; academic-course-project/1.0)"
 
 
+def write_csv(frame: pd.DataFrame, path: Path) -> None:
+    """Write UTF-8-BOM CSV with platform-independent LF line endings."""
+    with path.open("w", encoding="utf-8-sig", newline="") as handle:
+        frame.to_csv(handle, index=False, lineterminator="\n")
+
+
 def fetch(url: str, retries: int = 3, timeout: int = 90) -> tuple[bytes, dict[str, str]]:
     last_error: Exception | None = None
     for attempt in range(retries):
@@ -148,7 +154,9 @@ def fetch_npb_basement(manifest: list[dict]) -> dict[int, dict]:
         players[year] = matches[0]
 
     (PROCESSED / f"npb_basement_imai_{NPB_DETAIL_TAG}.json").write_text(
-        json.dumps(players, ensure_ascii=False, indent=2), encoding="utf-8"
+        json.dumps(players, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
     )
 
     pitching_rows = []
@@ -163,20 +171,17 @@ def fetch_npb_basement(manifest: list[dict]) -> dict[int, dict]:
         for area, row in stats.get("pd", {}).items():
             plate_discipline_rows.append({"year": year, "area": area, **row})
 
-    pd.DataFrame(pitching_rows).to_csv(
+    write_csv(
+        pd.DataFrame(pitching_rows),
         PROCESSED / f"npb_basement_imai_advanced_pitching_{NPB_DETAIL_TAG}.csv",
-        index=False,
-        encoding="utf-8-sig",
     )
-    pd.DataFrame(pitch_value_rows).to_csv(
+    write_csv(
+        pd.DataFrame(pitch_value_rows),
         PROCESSED / f"npb_basement_imai_pitch_values_{NPB_DETAIL_TAG}.csv",
-        index=False,
-        encoding="utf-8-sig",
     )
-    pd.DataFrame(plate_discipline_rows).to_csv(
+    write_csv(
+        pd.DataFrame(plate_discipline_rows),
         PROCESSED / f"npb_basement_imai_plate_discipline_{NPB_DETAIL_TAG}.csv",
-        index=False,
-        encoding="utf-8-sig",
     )
     return players
 
@@ -255,11 +260,7 @@ def main() -> None:
         raise ValueError("Statcast date range exceeded frozen analysis window")
 
     npb = normalize_npb_pitching(downloaded["npb_imai_player_page.html"].read_bytes())
-    npb.to_csv(
-        PROCESSED / f"npb_imai_pitching_{NPB_START_YEAR}_{NPB_END_YEAR}.csv",
-        index=False,
-        encoding="utf-8-sig",
-    )
+    write_csv(npb, PROCESSED / f"npb_imai_pitching_{NPB_START_YEAR}_{NPB_END_YEAR}.csv")
 
     for entry in manifest:
         path = ROOT / entry["file"]
@@ -270,10 +271,18 @@ def main() -> None:
                 entry["rows_excluding_header"] = None
 
     manifest_path = RAW / "source_manifest.json"
-    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+    manifest_path.write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
 
     with (RAW / "source_manifest.csv").open("w", newline="", encoding="utf-8-sig") as handle:
-        writer = csv.DictWriter(handle, fieldnames=sorted({key for row in manifest for key in row}))
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=sorted({key for row in manifest for key in row}),
+            lineterminator="\n",
+        )
         writer.writeheader()
         writer.writerows(manifest)
 
