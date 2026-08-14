@@ -1,0 +1,66 @@
+{
+  "generated_at_utc": "2026-08-14T03:22:47.708909+00:00",
+  "data_reconciliation_ok": true,
+  "data_reconciliation_rows": [
+    {
+      "check": "Statcast pitch rows",
+      "computed": 1240,
+      "reference": 1240,
+      "difference": 0
+    },
+    {
+      "check": "Strikeouts",
+      "computed": 80,
+      "reference": 80,
+      "difference": 0
+    },
+    {
+      "check": "Walks",
+      "computed": 42,
+      "reference": 42,
+      "difference": 0
+    },
+    {
+      "check": "Games",
+      "computed": 17,
+      "reference": 17,
+      "difference": 0
+    }
+  ],
+  "source_manifest_entries": 17,
+  "source_hash_errors": [],
+  "formal_docx": {
+    "path": "reports\\今井达也_MLB调整决策_正式文稿.docx",
+    "a4_geometry": true,
+    "page_width_twips": 11906,
+    "page_height_twips": 16838,
+    "microsoft_yahei_in_styles": true,
+    "contains_title": true,
+    "thesis_paragraph_bold": true,
+    "rendered_pages": 2,
+    "expected_pages": 2,
+    "page_count_ok": true
+  },
+  "full_draft_docx": {
+    "path": "reports\\今井达也_MLB调整决策_完整分析底稿.docx",
+    "a4_geometry": true,
+    "page_width_twips": 11906,
+    "page_height_twips": 16838,
+    "microsoft_yahei_in_styles": true,
+    "contains_title": true,
+    "thesis_paragraph_bold": false,
+    "rendered_pages": 7,
+    "expected_pages": 7,
+    "page_count_ok": true
+  },
+  "artifact_manifest_entries": 35,
+  "visual_review": {
+    "formal_pages_reviewed": 2,
+    "full_draft_pages_reviewed": 7,
+    "clipped_text": false,
+    "overlaps": false,
+    "broken_tables": false,
+    "unexpected_font_substitution": false
+  },
+  "overall_pass": true
+}

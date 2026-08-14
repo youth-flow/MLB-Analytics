@@ -30,7 +30,18 @@
 python scripts/fetch_data.py
 python scripts/analyze.py
 python scripts/build_reports.py
+python scripts/verify_project.py
 ```
 
 具体运行命令、环境和文件哈希见 `qa/reproducibility_report.md`。
 
+## 最终提交物
+
+- `reports/今井达也_MLB调整决策_正式文稿.docx`：按课程要求制作的 A4 两页正式文稿，第一段为加粗结论。
+- `reports/今井达也_MLB调整决策_完整分析底稿.docx`：7 页完整底稿，含来源、方法、计算、四轮分析循环、反证、限制和 AI 使用说明。
+- `reports/formal_manuscript.md`、`reports/full_analysis_draft.md`：可审查的纯文本版本。
+- `qa/integrity_report.json`、`qa/reproducibility_report.md`：数据闭合、哈希、文档结构和逐页渲染检查。
+
+## 核心结论
+
+今井的三振与挥空能力仍在，主要瓶颈是 BB%翻倍、首球和好球区控制下降，以及 NPB 2025 已成熟变速球在 MLB 的使用率与速度分层消失。两次牛棚登板只提供积极的小样本过程信号；建议把多局牛棚作为短期校准环境，以预先声明的控球、球种和负荷门槛决定何时重返先发。
