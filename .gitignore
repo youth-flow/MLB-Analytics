@@ -1,0 +1,10 @@
+.deps/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+qa/rendered/
+qa/tmp/
+~$*.docx
+.DS_Store
+Thumbs.db

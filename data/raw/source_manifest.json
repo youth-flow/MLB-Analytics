@@ -1,0 +1,72 @@
+[
+  {
+    "file": "data/raw/statcast_imai_2026.csv",
+    "url": "https://baseballsavant.mlb.com/statcast_search/csv?all=true&hfPT=&hfAB=&hfBBT=&hfPR=&hfZ=&stadium=&hfBBL=&hfNewZones=&hfGT=R%7CPO%7CS%7C=&hfSea=&hfSit=&player_type=pitcher&hfOuts=&opponent=&pitcher_throws=&batter_stands=&hfSA=&game_date_gt=2026-03-29&game_date_lt=2026-08-12&pitchers_lookup%5B%5D=837227&team=&position=&hfRO=&home_road=&hfFlag=&metric_1=&hfInn=&min_pitches=0&min_results=0&group_by=name&sort_col=pitches&player_event_sort=h_launch_speed&sort_order=desc&min_abs=0&type=details&",
+    "retrieved_at_utc": "2026-08-14T02:53:43.614594+00:00",
+    "sha256": "1b37ea070d93270e753fafe6cbb17c4bba1e02572fdc89eb7725335f2968bf6c",
+    "bytes": 846925,
+    "content_type": "application/download; charset=utf-8",
+    "rows_excluding_header": 1241
+  },
+  {
+    "file": "data/raw/mlb_statsapi_game_log_2026.json",
+    "url": "https://statsapi.mlb.com/api/v1/people/837227/stats?stats=gameLog&group=pitching&season=2026",
+    "retrieved_at_utc": "2026-08-14T02:53:45.682084+00:00",
+    "sha256": "71a4800e88cccca4b66f718a4614877d2f2e435a038a5e882b9d714b06bc8d74",
+    "bytes": 29262,
+    "content_type": "application/json;charset=UTF-8"
+  },
+  {
+    "file": "data/raw/npb_imai_player_page.html",
+    "url": "https://npb.jp/bis/players/31335134.html",
+    "retrieved_at_utc": "2026-08-14T02:53:46.223988+00:00",
+    "sha256": "6e834d7c596437de47e9c6856909a5274d52eff6a5111a03a43d1ea77439786f",
+    "bytes": 52283,
+    "content_type": "text/html"
+  },
+  {
+    "file": "data/raw/savant_expected_stats_pitchers_2026.csv",
+    "url": "https://baseballsavant.mlb.com/leaderboard/expected_statistics?type=pitcher&year=2026&position=&team=&filterType=pa&min=25&csv=true",
+    "retrieved_at_utc": "2026-08-14T02:53:46.648199+00:00",
+    "sha256": "c16e3750d24ff1f612ee8ed16469a8bf671c43eb0c281ead78f34d23f6c7d390",
+    "bytes": 105771,
+    "content_type": "text/csv; charset=utf-8",
+    "rows_excluding_header": 657
+  },
+  {
+    "file": "data/raw/savant_pitch_arsenal_stats_2026.csv",
+    "url": "https://baseballsavant.mlb.com/leaderboard/pitch-arsenal-stats?type=pitcher&pitchType=&year=2026&team=&min=1&csv=true",
+    "retrieved_at_utc": "2026-08-14T02:53:47.168684+00:00",
+    "sha256": "b5885043a07cd2c3c77f14171bf46626d0680703af397552d1a6c107da1b705a",
+    "bytes": 443268,
+    "content_type": "text/csv; charset=utf-8",
+    "rows_excluding_header": 3426
+  },
+  {
+    "file": "data/raw/savant_percentile_rankings_2026.csv",
+    "url": "https://baseballsavant.mlb.com/leaderboard/percentile-rankings?type=pitcher&year=2026&position=&team=&csv=true",
+    "retrieved_at_utc": "2026-08-14T02:53:47.479682+00:00",
+    "sha256": "f51098ea811f9ac340f574304c25ba12abc8adbe307889b725c3c1fed885785c",
+    "bytes": 46449,
+    "content_type": "text/csv; charset=utf-8",
+    "rows_excluding_header": 634
+  },
+  {
+    "file": "data/raw/savant_pitch_movement_ff_2026.csv",
+    "url": "https://baseballsavant.mlb.com/leaderboard/pitch-movement?year=2026&team=&min=50&pitch_type=FF&hand=&x=pitcher_break_x_hidden&z=pitcher_break_z_hidden&csv=true",
+    "retrieved_at_utc": "2026-08-14T02:53:47.864876+00:00",
+    "sha256": "17711d8eb4c100d30f9dde4bb0fa842a6bcac5e36bf5c79f883ffd6650e1dd04",
+    "bytes": 107105,
+    "content_type": "text/csv; charset=utf-8",
+    "rows_excluding_header": 523
+  },
+  {
+    "file": "data/raw/savant_pitch_movement_sl_2026.csv",
+    "url": "https://baseballsavant.mlb.com/leaderboard/pitch-movement?year=2026&team=&min=50&pitch_type=SL&hand=&x=pitcher_break_x_hidden&z=pitcher_break_z_hidden&csv=true",
+    "retrieved_at_utc": "2026-08-14T02:53:48.222326+00:00",
+    "sha256": "5078e518c5c3a02359bd7b4b743a41de285d97ab9f2897c9d9d21927031ba0b8",
+    "bytes": 65662,
+    "content_type": "text/csv; charset=utf-8",
+    "rows_excluding_header": 336
+  }
+]

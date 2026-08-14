@@ -1,0 +1,8 @@
+pandas
+lxml
+python-docx
+openpyxl
+matplotlib
+seaborn
+statsmodels
+
