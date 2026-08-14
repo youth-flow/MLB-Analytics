@@ -22,7 +22,8 @@ def command(script_name: str, *extra_args: str) -> list[str]:
 
 def run_step(script_name: str, *extra_args: str) -> None:
     argv = command(script_name, *extra_args)
-    print(f"[pipeline] {' '.join(argv)}", flush=True)
+    suffix = " " + " ".join(extra_args) if extra_args else ""
+    print(f"[pipeline] scripts/{script_name}{suffix}", flush=True)
     subprocess.run(argv, cwd=ROOT, check=True)
 
 

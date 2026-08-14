@@ -588,7 +588,7 @@ def main() -> None:
         print(f"Preserving committed deterministic figure artifacts because {reason}.")
     else:
         raise RuntimeError("CJK font unavailable and committed figure artifacts are missing")
-    print(json.dumps(summary, ensure_ascii=False, indent=2))
+    print(json.dumps(summary, ensure_ascii=True, indent=2))
 
 
 if __name__ == "__main__":

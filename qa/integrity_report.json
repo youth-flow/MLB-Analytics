@@ -121,7 +121,7 @@
     "artifact_manifest": {
       "status": "passed",
       "entries": 45,
-      "manifest_sha256": "2f92b04297439bf5cdd91254edfa60ccd724d6e1b7f5dfe45ec4024d82129202",
+      "manifest_sha256": "fa20adb5bde53c152c8f02865f55bf4fdaf8e27707c2160048053572b5a7cdec",
       "excluded_path_leaks": [],
       "deterministic_order": true
     },

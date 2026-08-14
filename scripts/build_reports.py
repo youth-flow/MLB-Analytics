@@ -525,8 +525,7 @@ def main() -> None:
     PUBLIC.mkdir(parents=True, exist_ok=True)
     build_formal()
     build_full()
-    print(FORMAL)
-    print(FULL)
+    print("Built both public DOCX reports in reports/public/.")
 
 
 if __name__ == "__main__":

@@ -649,7 +649,7 @@ def main(argv: list[str] | None = None) -> int:
         encoding="utf-8",
         newline="\n",
     )
-    print(json.dumps(checks, ensure_ascii=False, indent=2))
+    print(json.dumps(checks, ensure_ascii=True, indent=2))
     success = bool(checks["overall_pass"])
     if args.require_visual:
         success = success and bool(checks["submission_ready"])
