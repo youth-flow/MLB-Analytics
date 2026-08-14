@@ -93,6 +93,7 @@ python scripts/verify_project.py
 - 研究交付物 manifest 的重建。
 
 GitHub Actions 在 Windows/Python 3.12 上运行相同的冻结离线流水线与回归测试，不执行联网刷新。
+CI 明确保留仓库中已经审阅的两张确定性图表，避免云端运行器缺少中文字体时产生字体替换；本地存在微软雅黑、黑体或 Noto CJK 时，分析脚本会正常重绘图表。
 
 ## 文档渲染与人工视觉 QA
 

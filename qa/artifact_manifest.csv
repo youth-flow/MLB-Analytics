@@ -1,6 +1,6 @@
 file,bytes,digest_kind,sha256
 .gitattributes,474,text-lf-sha256-v1,b4d6c955bb2b7974395a6b26547241e0bd217f444d550635bb7b1d3df11a12f3
-.github/workflows/ci.yml,730,text-lf-sha256-v1,7e61c830043567d20541a1d288ede0eac1d71848f8fb91721b3e7abf76c9c9e9
+.github/workflows/ci.yml,1041,text-lf-sha256-v1,45a8dcd6203956a771255fd2258c8768c6d9e1ae057d17edaf2fcb577c45def5
 .gitignore,519,text-lf-sha256-v1,b1f8542599945f254ccd14f224fa4192589f47d8d242f56f62f6414ba5cb6c17
 .python-version,5,text-lf-sha256-v1,7b55f8e67b5623c4bef3fa691288da9437d79d3aba156de48d481db32ac7d16d
 README.md,5793,text-lf-sha256-v1,9d801112534dbf8c89dff7842ba8d888deb0c485291165f77081ba804688c54a
@@ -20,7 +20,7 @@ data/processed/npb_basement_imai_advanced_pitching_2023_2025.csv,527,text-lf-sha
 data/processed/npb_basement_imai_pitch_values_2023_2025.csv,1681,text-lf-sha256-v1,acad8af6fc4d132f997090b6e267c0e35e096803f9009a2b14e2233f6dffce5e
 data/processed/npb_basement_imai_plate_discipline_2023_2025.csv,181,text-lf-sha256-v1,644d81874bc1ea77f0ea9fbaa735c422232f31dbd3907ab46bbbd75fad8e8905
 data/processed/npb_imai_pitching_2018_2025.csv,2071,text-lf-sha256-v1,38f2c022fe312dd8a751e82cb6502c69512551ee4e35ed0c39e8f46b04a7aba5
-docs/reproducibility.md,4460,text-lf-sha256-v1,629a4e2e34fa603c9e093400f733c023a5f34b571ba779f29772e34492cc93f3
+docs/reproducibility.md,4675,text-lf-sha256-v1,c3fb5e37e0ed7dcbf740bc42806f4952f5accf34561065a65b58968b5209bcbc
 docs/research/ai_prompt_log.md,3445,text-lf-sha256-v1,f9b1b85c37046f2a1a1b6d5c43b7ea84a4a56673cd146bcb8cc443e366c48ed8
 docs/research/analysis_cycle_results.md,1850,text-lf-sha256-v1,5d1db7f6ba94fee7924fe077345b13613cd6fcda76f7443f4cec2cddd69ddd84
 docs/research/hypothesis_log.md,592,text-lf-sha256-v1,c80609ec8226d65676d84a44abe150ac639f1603ad3e1fd282ec65051e18f0c6
@@ -35,7 +35,7 @@ reports/public/今井达也_MLB调整决策_正式文稿.docx,170758,zip-content
 reports/sources/formal_manuscript.md,3933,text-lf-sha256-v1,00f54ebef097303e7b856e7e255599a5097a00c9a968e7f7cdac0bf91b64bd45
 reports/sources/full_analysis_draft.md,13258,text-lf-sha256-v1,1e7514d998afd20f8584eb26d0c69002249e025bd3394f3f6a69b00e0b6b61c4
 requirements.txt,87,text-lf-sha256-v1,e6ed0d4ff31d9baf1cfe2e7cb79d6d795d7374dc2a9b5955daaaf0b38c11e9eb
-scripts/analyze.py,28846,text-lf-sha256-v1,e14f490f5a2fcd8a71f68ea686a198d16c89296c708989998ef8c652e80b8894
+scripts/analyze.py,29920,text-lf-sha256-v1,10aa5a8ca70ae1a0bbdd3b2241322f120b6f99b3c536d2d3c9ef99e24601d80e
 scripts/build_reports.py,19055,text-lf-sha256-v1,6c3cb441a5f49d5071d627ce4eae1cb618a2cc6cda4a9c33524a4f68811c9d2c
 scripts/fetch_data.py,13264,text-lf-sha256-v1,3e25e6f95fcb9e2fc0e0475eb865a8c2377d25bdfec662a35ddae058236f9313
 scripts/run_pipeline.py,1919,text-lf-sha256-v1,55e5e28458eb0aa0acd4dc0083651f0cb36f751bdf43c9956a35f393f42b17c7

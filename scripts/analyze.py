@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 from pathlib import Path
 
 import numpy as np
@@ -165,15 +166,27 @@ def draw_panel(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int], title:
     draw.text((x0 + 28, y0 + 22), title, font=font, fill="#17324D")
 
 
-def font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
-    candidates = [
+def font_candidates(bold: bool = False) -> list[Path]:
+    return [
         Path("C:/Windows/Fonts/msyhbd.ttc" if bold else "C:/Windows/Fonts/msyh.ttc"),
         Path("C:/Windows/Fonts/simhei.ttf"),
+        Path(
+            "/usr/share/fonts/opentype/noto/"
+            + ("NotoSansCJK-Bold.ttc" if bold else "NotoSansCJK-Regular.ttc")
+        ),
+        Path("/System/Library/Fonts/PingFang.ttc"),
     ]
-    for candidate in candidates:
+
+
+def cjk_fonts_available() -> bool:
+    return all(any(candidate.exists() for candidate in font_candidates(bold)) for bold in (False, True))
+
+
+def font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
+    for candidate in font_candidates(bold):
         if candidate.exists():
             return ImageFont.truetype(str(candidate), size=size)
-    return ImageFont.load_default()
+    raise RuntimeError("No CJK-capable font is available for deterministic figure rendering")
 
 
 def grouped_bars(
@@ -562,8 +575,19 @@ def main() -> None:
         newline="\n",
     )
 
-    make_core_figure(outcomes, pitch_change, pitch_summary)
-    make_role_figure(role_summary, platoon)
+    figure_paths = [
+        FIGURES / "figure_1_core_diagnosis.png",
+        FIGURES / "figure_2_role_platoon.png",
+    ]
+    skip_figure_render = os.environ.get("MLB_ANALYTICS_SKIP_FIGURE_RENDER") == "1"
+    if not skip_figure_render and cjk_fonts_available():
+        make_core_figure(outcomes, pitch_change, pitch_summary)
+        make_role_figure(role_summary, platoon)
+    elif all(path.is_file() for path in figure_paths):
+        reason = "CI requested" if skip_figure_render else "no CJK font was found"
+        print(f"Preserving committed deterministic figure artifacts because {reason}.")
+    else:
+        raise RuntimeError("CJK font unavailable and committed figure artifacts are missing")
     print(json.dumps(summary, ensure_ascii=False, indent=2))
 
 

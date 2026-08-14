@@ -30,6 +30,17 @@ jobs:
 
       - name: Run frozen offline pipeline
         run: python scripts/run_pipeline.py
+        env:
+          MLB_ANALYTICS_SKIP_FIGURE_RENDER: "1"
 
       - name: Run unit tests
         run: python -m unittest discover -s tests -v
+
+      - name: Confirm byte-stable rebuild
+        shell: pwsh
+        run: |
+          $changes = git status --porcelain
+          if ($changes) {
+            git status --short
+            throw "Offline rebuild changed tracked files."
+          }
