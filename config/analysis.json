@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "player": {
+    "name_en": "Tatsuya Imai",
+    "name_zh": "今井达也",
+    "mlbam_id": 837227,
+    "npb_player_id": 31335134
+  },
+  "analysis_window": {
+    "mlb_start_date": "2026-03-29",
+    "mlb_end_date": "2026-08-12",
+    "mlb_season": 2026,
+    "npb_start_year": 2018,
+    "npb_end_year": 2025,
+    "npb_reference_year": 2025,
+    "npb_basement_years": [2023, 2024, 2025]
+  },
+  "decision_thresholds": {
+    "minimum_evaluation_plate_appearances": 60,
+    "zone_pct_min": 46.0,
+    "first_pitch_strike_pct_min": 60.0,
+    "walk_pct_max": 10.0,
+    "fallback_walk_pct": 12.0,
+    "changeup_usage_pct_target": [8.0, 12.0],
+    "changeup_velocity_gap_mph_target": [8.0, 10.0],
+    "workload_pitch_steps": [45, 60, 75]
+  },
+  "data_policy": {
+    "default_mode": "offline_frozen",
+    "raw_snapshots_are_immutable": true,
+    "network_refresh_requires_flag": "--refresh-data"
+  }
+}

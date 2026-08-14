@@ -13,6 +13,11 @@
   "whiff_pct": 32.28782287822878,
   "chase_pct": 27.181688125894134,
   "two_pitch_usage_pct": 88.87096774193549,
+  "npb_reference_year": 2025,
+  "npb_reference_k_pct": 27.8,
+  "npb_reference_bb_pct": 7.0,
+  "npb_changeup_usage_pct": 12.67,
+  "npb_changeup_velocity_mph": 84.73017577348287,
   "npb_2025_changeup_usage_pct": 12.67,
   "mlb_changeup_usage_pct": 2.338709677419355,
   "npb_2025_changeup_velocity_mph": 84.73017577348287,
@@ -23,5 +28,25 @@
   "relief_zone_pct": 46.06741573033708,
   "relief_first_pitch_strike_pct": 73.91304347826087,
   "relief_whiff_pct": 40.0,
-  "relief_plate_appearances": 23
+  "relief_plate_appearances": 23,
+  "decision_thresholds": {
+    "minimum_evaluation_plate_appearances": 60,
+    "zone_pct_min": 46.0,
+    "first_pitch_strike_pct_min": 60.0,
+    "walk_pct_max": 10.0,
+    "fallback_walk_pct": 12.0,
+    "changeup_usage_pct_target": [
+      8.0,
+      12.0
+    ],
+    "changeup_velocity_gap_mph_target": [
+      8.0,
+      10.0
+    ],
+    "workload_pitch_steps": [
+      45,
+      60,
+      75
+    ]
+  }
 }

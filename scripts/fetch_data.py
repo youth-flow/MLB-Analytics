@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import csv
 import hashlib
 import json
@@ -14,14 +15,24 @@ import pandas as pd
 
 
 ROOT = Path(__file__).resolve().parents[1]
+CONFIG_PATH = ROOT / "config" / "analysis.json"
+CONFIG = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+PLAYER = CONFIG["player"]
+WINDOW = CONFIG["analysis_window"]
 RAW = ROOT / "data" / "raw"
 PROCESSED = ROOT / "data" / "processed"
 RAW.mkdir(parents=True, exist_ok=True)
 PROCESSED.mkdir(parents=True, exist_ok=True)
 
-START_DATE = "2026-03-29"
-END_DATE = "2026-08-12"
-PITCHER_ID = 837227
+START_DATE = str(WINDOW["mlb_start_date"])
+END_DATE = str(WINDOW["mlb_end_date"])
+MLB_SEASON = int(WINDOW["mlb_season"])
+PITCHER_ID = int(PLAYER["mlbam_id"])
+NPB_PLAYER_ID = int(PLAYER["npb_player_id"])
+NPB_START_YEAR = int(WINDOW["npb_start_year"])
+NPB_END_YEAR = int(WINDOW["npb_end_year"])
+NPB_BASEMENT_YEARS = tuple(int(year) for year in WINDOW["npb_basement_years"])
+NPB_DETAIL_TAG = f"{min(NPB_BASEMENT_YEARS)}_{max(NPB_BASEMENT_YEARS)}"
 USER_AGENT = "Mozilla/5.0 (compatible; academic-course-project/1.0)"
 
 
@@ -77,6 +88,7 @@ def normalize_npb_pitching(html_bytes: bytes) -> pd.DataFrame:
     year = pd.to_numeric(frame["年度"], errors="coerce")
     frame = frame[year.between(2000, 2100) & frame["登板"].notna()].copy()
     frame["年度"] = pd.to_numeric(frame["年度"], errors="raise").astype(int)
+    frame = frame[frame["年度"].between(NPB_START_YEAR, NPB_END_YEAR)].copy()
 
     def innings_to_outs(value: object) -> int:
         compact = str(value).replace(" ", "")
@@ -117,7 +129,7 @@ def fetch_npb_basement(manifest: list[dict]) -> dict[int, dict]:
     index_text = index_payload.decode("utf-8", errors="replace")
 
     players: dict[int, dict] = {}
-    for year in (2023, 2024, 2025):
+    for year in NPB_BASEMENT_YEARS:
         module_match = re.search(rf"\./({year}_1g-[A-Za-z0-9_-]+\.js)", index_text)
         if not module_match:
             raise ValueError(f"Could not discover NPB Basement {year} top-league module")
@@ -135,7 +147,7 @@ def fetch_npb_basement(manifest: list[dict]) -> dict[int, dict]:
             raise ValueError(f"Expected one Tatsuya Imai record for {year}, found {len(matches)}")
         players[year] = matches[0]
 
-    (PROCESSED / "npb_basement_imai_2023_2025.json").write_text(
+    (PROCESSED / f"npb_basement_imai_{NPB_DETAIL_TAG}.json").write_text(
         json.dumps(players, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
@@ -152,51 +164,77 @@ def fetch_npb_basement(manifest: list[dict]) -> dict[int, dict]:
             plate_discipline_rows.append({"year": year, "area": area, **row})
 
     pd.DataFrame(pitching_rows).to_csv(
-        PROCESSED / "npb_basement_imai_advanced_pitching_2023_2025.csv", index=False, encoding="utf-8-sig"
+        PROCESSED / f"npb_basement_imai_advanced_pitching_{NPB_DETAIL_TAG}.csv",
+        index=False,
+        encoding="utf-8-sig",
     )
     pd.DataFrame(pitch_value_rows).to_csv(
-        PROCESSED / "npb_basement_imai_pitch_values_2023_2025.csv", index=False, encoding="utf-8-sig"
+        PROCESSED / f"npb_basement_imai_pitch_values_{NPB_DETAIL_TAG}.csv",
+        index=False,
+        encoding="utf-8-sig",
     )
     pd.DataFrame(plate_discipline_rows).to_csv(
-        PROCESSED / "npb_basement_imai_plate_discipline_2023_2025.csv", index=False, encoding="utf-8-sig"
+        PROCESSED / f"npb_basement_imai_plate_discipline_{NPB_DETAIL_TAG}.csv",
+        index=False,
+        encoding="utf-8-sig",
     )
     return players
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Create a new online data freeze for the Imai MLB analysis."
+    )
+    parser.add_argument(
+        "--refresh-data",
+        action="store_true",
+        help="explicitly allow network access and replacement of frozen raw snapshots",
+    )
+    return parser.parse_args()
+
+
 def main() -> None:
+    args = parse_args()
+    if not args.refresh_data:
+        raise SystemExit(
+            "Refusing to overwrite frozen snapshots without --refresh-data. "
+            "For offline reproduction, run scripts/analyze.py instead."
+        )
+
     manifest: list[dict] = []
     sources = {
-        "statcast_imai_2026.csv": statcast_pitcher_url(),
-        "mlb_statsapi_game_log_2026.json": (
-            f"https://statsapi.mlb.com/api/v1/people/{PITCHER_ID}/stats?stats=gameLog&group=pitching&season=2026"
+        f"statcast_imai_{MLB_SEASON}.csv": statcast_pitcher_url(),
+        f"mlb_statsapi_game_log_{MLB_SEASON}.json": (
+            f"https://statsapi.mlb.com/api/v1/people/{PITCHER_ID}/stats?stats=gameLog"
+            f"&group=pitching&season={MLB_SEASON}"
         ),
-        "npb_imai_player_page.html": "https://npb.jp/bis/players/31335134.html",
-        "savant_imai_player_page.html": "https://baseballsavant.mlb.com/savant-player/tatsuya-imai-837227",
-        "mlb_imai_player_page.html": "https://www.mlb.com/player/tatsuya-imai-837227",
+        "npb_imai_player_page.html": f"https://npb.jp/bis/players/{NPB_PLAYER_ID}.html",
+        "savant_imai_player_page.html": f"https://baseballsavant.mlb.com/savant-player/tatsuya-imai-{PITCHER_ID}",
+        "mlb_imai_player_page.html": f"https://www.mlb.com/player/tatsuya-imai-{PITCHER_ID}",
         "mlb_imai_adjustment_article_2026-05-31.html": (
             "https://www.mlb.com/astros/news/tatsuya-imai-adjusting-to-pitching-in-major-leagues"
         ),
         "mlb_imai_bullpen_article_2026-07-31.html": (
             "https://www.mlb.com/astros/news/tatsuya-imai-moved-to-astros-bullpen"
         ),
-        "savant_expected_stats_pitchers_2026.csv": (
-            "https://baseballsavant.mlb.com/leaderboard/expected_statistics?type=pitcher&year=2026"
+        f"savant_expected_stats_pitchers_{MLB_SEASON}.csv": (
+            f"https://baseballsavant.mlb.com/leaderboard/expected_statistics?type=pitcher&year={MLB_SEASON}"
             "&position=&team=&filterType=pa&min=25&csv=true"
         ),
-        "savant_pitch_arsenal_stats_2026.csv": (
+        f"savant_pitch_arsenal_stats_{MLB_SEASON}.csv": (
             "https://baseballsavant.mlb.com/leaderboard/pitch-arsenal-stats?type=pitcher&pitchType="
-            "&year=2026&team=&min=1&csv=true"
+            f"&year={MLB_SEASON}&team=&min=1&csv=true"
         ),
-        "savant_percentile_rankings_2026.csv": (
-            "https://baseballsavant.mlb.com/leaderboard/percentile-rankings?type=pitcher&year=2026"
+        f"savant_percentile_rankings_{MLB_SEASON}.csv": (
+            f"https://baseballsavant.mlb.com/leaderboard/percentile-rankings?type=pitcher&year={MLB_SEASON}"
             "&position=&team=&csv=true"
         ),
-        "savant_pitch_movement_ff_2026.csv": (
-            "https://baseballsavant.mlb.com/leaderboard/pitch-movement?year=2026&team=&min=50"
+        f"savant_pitch_movement_ff_{MLB_SEASON}.csv": (
+            f"https://baseballsavant.mlb.com/leaderboard/pitch-movement?year={MLB_SEASON}&team=&min=50"
             "&pitch_type=FF&hand=&x=pitcher_break_x_hidden&z=pitcher_break_z_hidden&csv=true"
         ),
-        "savant_pitch_movement_sl_2026.csv": (
-            "https://baseballsavant.mlb.com/leaderboard/pitch-movement?year=2026&team=&min=50"
+        f"savant_pitch_movement_sl_{MLB_SEASON}.csv": (
+            f"https://baseballsavant.mlb.com/leaderboard/pitch-movement?year={MLB_SEASON}&team=&min=50"
             "&pitch_type=SL&hand=&x=pitcher_break_x_hidden&z=pitcher_break_z_hidden&csv=true"
         ),
     }
@@ -210,14 +248,18 @@ def main() -> None:
     basement_players = fetch_npb_basement(manifest)
     print(f"downloaded NPB Basement snapshots for: {sorted(basement_players)}")
 
-    statcast = pd.read_csv(downloaded["statcast_imai_2026.csv"], low_memory=False)
+    statcast = pd.read_csv(downloaded[f"statcast_imai_{MLB_SEASON}.csv"], low_memory=False)
     if len(statcast) < 1000 or set(statcast["pitcher"].dropna().astype(int)) != {PITCHER_ID}:
         raise ValueError("Statcast integrity check failed: unexpected row count or pitcher id")
     if statcast["game_date"].min() < START_DATE or statcast["game_date"].max() > END_DATE:
         raise ValueError("Statcast date range exceeded frozen analysis window")
 
     npb = normalize_npb_pitching(downloaded["npb_imai_player_page.html"].read_bytes())
-    npb.to_csv(PROCESSED / "npb_imai_pitching_2018_2025.csv", index=False, encoding="utf-8-sig")
+    npb.to_csv(
+        PROCESSED / f"npb_imai_pitching_{NPB_START_YEAR}_{NPB_END_YEAR}.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
 
     for entry in manifest:
         path = ROOT / entry["file"]

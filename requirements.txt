@@ -1,6 +1,6 @@
-numpy
-pandas
-Pillow
-python-docx
-lxml
-pypdf
+numpy==2.3.5
+pandas==3.0.1
+Pillow==12.3.0
+python-docx==1.2.0
+lxml==6.1.1
+pypdf==6.10.0

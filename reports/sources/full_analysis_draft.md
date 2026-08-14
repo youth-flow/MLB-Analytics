@@ -2,8 +2,8 @@
 
 ## 完整分析底稿：数据、计算、迭代、反证与决策门槛
 
-作者：杨炎新（3230102355）  
-研究冻结日：2026-08-12  
+公开版本：已匿名
+研究冻结日：2026-08-12
 项目目录：MLB-Analytics
 
 ## 摘要
@@ -150,8 +150,8 @@ MLB 中四缝线 43.5%、滑球 45.3%，合计 88.9%。滑球 Whiff 40.6%、xwOB
 
 ## 附录 B：AI 协作与研究诚信
 
-AI 用于读取课程要求、检索公开数据、编写抓取与分析代码、迭代假设、生成图表和起草文稿。每一步摘要记录在 `01_research/ai_prompt_log.md`；假设变化记录在 `01_research/analysis_cycle_results.md`。关键结论必须能由保存的数据和脚本重算。没有获得的数据不补写；低样本结果明确标记；观察性角色比较不表述为因果。
+AI 用于读取课程要求、检索公开数据、编写抓取与分析代码、迭代假设、生成图表和起草文稿。每一步摘要记录在 `docs/research/ai_prompt_log.md`；假设变化记录在 `docs/research/analysis_cycle_results.md`。关键结论必须能由保存的数据和脚本重算。没有获得的数据不补写；低样本结果明确标记；观察性角色比较不表述为因果。
 
 ## 附录 C：来源
 
-S1 MLB StatsAPI；S2 Baseball Savant Statcast Search；S3 Savant Expected Statistics；S4 Savant Pitch Arsenal；S5 NPB 官方球员页；S6 NPB Basement；S7 MLB.com 2026-05-31；S8 MLB.com 2026-07-31。完整 URL、本地文件名、下载时间和 SHA-256 见 `01_research/source_register.md` 与 `data/raw/source_manifest.csv`。
+S1 MLB StatsAPI；S2 Baseball Savant Statcast Search；S3 Savant Expected Statistics；S4 Savant Pitch Arsenal；S5 NPB 官方球员页；S6 NPB Basement；S7 MLB.com 2026-05-31；S8 MLB.com 2026-07-31。完整 URL、本地文件名、下载时间和 SHA-256 见 `docs/research/source_register.md` 与 `data/raw/source_manifest.csv`。

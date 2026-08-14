@@ -42,4 +42,4 @@
 ## 步骤 7：成稿与质量控制
 
 - AI 工作：生成两页正式文稿和完整分析底稿；使用固定版式、Word 原生表格和图表；将两个 DOCX 渲染为逐页 PNG 检查页数、溢出、字体、表格与分页；形成复现与完整性报告。
-- 人工可复核入口：`README.md`、`data/raw/source_manifest.csv`、`qa/data_reconciliation.csv`、`01_research/analysis_cycle_results.md`、`scripts/` 和 `reports/`。
+- 人工可复核入口：`README.md`、`data/raw/source_manifest.csv`、`qa/data_reconciliation.csv`、`docs/research/analysis_cycle_results.md`、`scripts/` 和 `reports/`。

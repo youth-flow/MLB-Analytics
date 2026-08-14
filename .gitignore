@@ -1,10 +1,38 @@
+# Python environments and caches
 .deps/
 .venv/
+venv/
 __pycache__/
-*.pyc
+*.py[cod]
+*.egg-info/
 .pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Coverage and build outputs
+.coverage
+.coverage.*
+htmlcov/
+build/
+dist/
+
+# Local document-rendering intermediates
 qa/rendered/
 qa/tmp/
 ~$*.docx
+
+# Submission-only personalized reports
+reports/private/
+
+# Editors and operating systems
+.idea/
+.vscode/
+*.code-workspace
 .DS_Store
 Thumbs.db
+desktop.ini

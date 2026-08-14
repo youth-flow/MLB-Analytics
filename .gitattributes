@@ -1,0 +1,14 @@
+# Keep ordinary source and documentation text stable across platforms.
+* text=auto eol=lf
+
+# Raw snapshots are immutable byte-level evidence. Do not normalize or diff them.
+data/raw/** binary
+
+# Manifests remain reviewable text even though they live under data/raw/.
+data/raw/source_manifest.csv -binary text eol=lf diff merge
+data/raw/source_manifest.json -binary text eol=lf diff merge
+
+# Generated and office artifacts are binary.
+*.docx binary
+*.png binary
+*.pdf binary

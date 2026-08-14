@@ -10,13 +10,30 @@ from PIL import Image, ImageDraw, ImageFont
 
 
 ROOT = Path(__file__).resolve().parents[1]
+CONFIG_PATH = ROOT / "config" / "analysis.json"
+CONFIG = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+PLAYER = CONFIG["player"]
+WINDOW = CONFIG["analysis_window"]
+DECISION_THRESHOLDS = CONFIG["decision_thresholds"]
 RAW = ROOT / "data" / "raw"
 PROCESSED = ROOT / "data" / "processed"
 FIGURES = ROOT / "outputs" / "figures"
-RESEARCH = ROOT / "01_research"
+RESEARCH = ROOT / "docs" / "research"
 QA = ROOT / "qa"
 for directory in (PROCESSED, FIGURES, RESEARCH, QA):
     directory.mkdir(parents=True, exist_ok=True)
+
+PITCHER_ID = int(PLAYER["mlbam_id"])
+START_DATE = str(WINDOW["mlb_start_date"])
+END_DATE = str(WINDOW["mlb_end_date"])
+MLB_SEASON = int(WINDOW["mlb_season"])
+NPB_REFERENCE_YEAR = int(WINDOW["npb_reference_year"])
+NPB_BASEMENT_YEARS = tuple(int(year) for year in WINDOW["npb_basement_years"])
+NPB_DETAIL_TAG = f"{min(NPB_BASEMENT_YEARS)}_{max(NPB_BASEMENT_YEARS)}"
+NPB_LEVEL_LABEL = f"NPB {NPB_REFERENCE_YEAR}"
+MLB_LEVEL_LABEL = f"MLB {MLB_SEASON}"
+_, CUTOFF_MONTH, CUTOFF_DAY = END_DATE.split("-")
+CUTOFF_DISPLAY = f"{int(CUTOFF_MONTH)} 月 {int(CUTOFF_DAY)} 日"
 
 SWING_DESCRIPTIONS = {
     "swinging_strike",
@@ -69,7 +86,9 @@ def classify_count(frame: pd.DataFrame) -> pd.Series:
 
 
 def parse_game_log() -> pd.DataFrame:
-    payload = json.loads((RAW / "mlb_statsapi_game_log_2026.json").read_text(encoding="utf-8"))
+    payload = json.loads(
+        (RAW / f"mlb_statsapi_game_log_{MLB_SEASON}.json").read_text(encoding="utf-8")
+    )
     rows = []
     for split in payload["stats"][0]["splits"]:
         stat = split["stat"]
@@ -94,7 +113,12 @@ def parse_game_log() -> pd.DataFrame:
             }
         )
     frame = pd.DataFrame(rows).sort_values("game_date")
-    frame.to_csv(PROCESSED / "mlb_game_log_2026.csv", index=False, encoding="utf-8-sig")
+    frame = frame[frame["game_date"].between(START_DATE, END_DATE)].copy()
+    frame.to_csv(
+        PROCESSED / f"mlb_game_log_{MLB_SEASON}.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
     return frame
 
 
@@ -184,7 +208,12 @@ def make_core_figure(outcomes: pd.DataFrame, pitch_change: pd.DataFrame, pitch_s
     image = Image.new("RGB", (1800, 1040), "white")
     draw = ImageDraw.Draw(image)
     draw.text((70, 36), "诊断：三振能力保留，控球与球种结构发生退化", font=font(42, True), fill="#102A43")
-    draw.text((72, 92), "NPB 2025 与 MLB 2026（截止 8 月 12 日）", font=font(24), fill="#627D98")
+    draw.text(
+        (72, 92),
+        f"{NPB_LEVEL_LABEL} 与 {MLB_LEVEL_LABEL}（截止 {CUTOFF_DISPLAY}）",
+        font=font(24),
+        fill="#627D98",
+    )
 
     left = (60, 145, 865, 655)
     right = (895, 145, 1740, 655)
@@ -198,8 +227,8 @@ def make_core_figure(outcomes: pd.DataFrame, pitch_change: pd.DataFrame, pitch_s
         (85, 190, 840, 635),
         ["K%", "BB%", "K-BB%"],
         [
-            ("NPB 2025", outcomes.loc[outcomes["level"] == "NPB 2025", ["K_pct", "BB_pct", "K_minus_BB_pct"]].iloc[0].tolist(), "#2A9D8F"),
-            ("MLB 2026", outcomes.loc[outcomes["level"] == "MLB 2026", ["K_pct", "BB_pct", "K_minus_BB_pct"]].iloc[0].tolist(), "#E76F51"),
+            (NPB_LEVEL_LABEL, outcomes.loc[outcomes["level"] == NPB_LEVEL_LABEL, ["K_pct", "BB_pct", "K_minus_BB_pct"]].iloc[0].tolist(), "#2A9D8F"),
+            (MLB_LEVEL_LABEL, outcomes.loc[outcomes["level"] == MLB_LEVEL_LABEL, ["K_pct", "BB_pct", "K_minus_BB_pct"]].iloc[0].tolist(), "#E76F51"),
         ],
         maximum=32,
     )
@@ -210,8 +239,8 @@ def make_core_figure(outcomes: pd.DataFrame, pitch_change: pd.DataFrame, pitch_s
         (920, 190, 1715, 635),
         [PITCH_NAMES[code] for code in ["FF", "SL", "CH", "FS"]],
         [
-            ("NPB 2025", [change.loc[code, "npb_usage_pct"] for code in ["FF", "SL", "CH", "FS"]], "#2A9D8F"),
-            ("MLB 2026", [change.loc[code, "mlb_usage_pct"] for code in ["FF", "SL", "CH", "FS"]], "#E76F51"),
+            (NPB_LEVEL_LABEL, [change.loc[code, "npb_usage_pct"] for code in ["FF", "SL", "CH", "FS"]], "#2A9D8F"),
+            (MLB_LEVEL_LABEL, [change.loc[code, "mlb_usage_pct"] for code in ["FF", "SL", "CH", "FS"]], "#E76F51"),
         ],
         maximum=55,
     )
@@ -280,7 +309,7 @@ def make_role_figure(role_summary: pd.DataFrame, platoon: pd.DataFrame) -> None:
 
 def main() -> None:
     game_log = parse_game_log()
-    statcast_all = pd.read_csv(RAW / "statcast_imai_2026.csv", low_memory=False)
+    statcast_all = pd.read_csv(RAW / f"statcast_imai_{MLB_SEASON}.csv", low_memory=False)
     pitches = statcast_all[statcast_all["pitch_type"].notna()].copy()
     role_by_game = game_log.set_index("game_pk")["role"].to_dict()
     pitches["role"] = pitches["game_pk"].map(role_by_game)
@@ -298,8 +327,8 @@ def main() -> None:
     role_summary = pd.DataFrame(role_rows)
     role_summary.to_csv(PROCESSED / "mlb_process_metrics_by_role.csv", index=False, encoding="utf-8-sig")
 
-    arsenal = pd.read_csv(RAW / "savant_pitch_arsenal_stats_2026.csv")
-    arsenal = arsenal[arsenal["player_id"] == 837227].set_index("pitch_type")
+    arsenal = pd.read_csv(RAW / f"savant_pitch_arsenal_stats_{MLB_SEASON}.csv")
+    arsenal = arsenal[arsenal["player_id"] == PITCHER_ID].set_index("pitch_type")
     pitch_rows = []
     for pitch_type, group in pitches.groupby("pitch_type"):
         swing_n = int(group["swing"].sum())
@@ -371,27 +400,29 @@ def main() -> None:
         )
     pd.DataFrame(tto_rows).to_csv(PROCESSED / "mlb_times_through_order.csv", index=False, encoding="utf-8-sig")
 
-    npb_advanced = pd.read_csv(PROCESSED / "npb_basement_imai_advanced_pitching_2023_2025.csv")
-    npb_2025 = npb_advanced[npb_advanced["year"] == 2025].iloc[0]
+    npb_advanced = pd.read_csv(
+        PROCESSED / f"npb_basement_imai_advanced_pitching_{NPB_DETAIL_TAG}.csv"
+    )
+    npb_reference = npb_advanced[npb_advanced["year"] == NPB_REFERENCE_YEAR].iloc[0]
     season_outs = int(game_log["outs"].sum())
     mlb_bf = int(game_log["batters_faced"].sum())
     mlb_k = int(game_log["strikeouts"].sum())
     mlb_bb = int(game_log["walks"].sum())
-    expected = pd.read_csv(RAW / "savant_expected_stats_pitchers_2026.csv")
-    expected_row = expected[expected["player_id"] == 837227].iloc[0]
+    expected = pd.read_csv(RAW / f"savant_expected_stats_pitchers_{MLB_SEASON}.csv")
+    expected_row = expected[expected["player_id"] == PITCHER_ID].iloc[0]
     outcomes = pd.DataFrame(
         [
             {
-                "level": "NPB 2025",
-                "BF": npb_2025["TBF"],
-                "K_pct": npb_2025["K%"],
-                "BB_pct": npb_2025["BB%"],
-                "K_minus_BB_pct": npb_2025["K-BB%"],
+                "level": NPB_LEVEL_LABEL,
+                "BF": npb_reference["TBF"],
+                "K_pct": npb_reference["K%"],
+                "BB_pct": npb_reference["BB%"],
+                "K_minus_BB_pct": npb_reference["K-BB%"],
                 "ERA": 1.92,
                 "xERA": math.nan,
             },
             {
-                "level": "MLB 2026",
+                "level": MLB_LEVEL_LABEL,
                 "BF": mlb_bf,
                 "K_pct": 100 * mlb_k / mlb_bf,
                 "BB_pct": 100 * mlb_bb / mlb_bf,
@@ -401,10 +432,14 @@ def main() -> None:
             },
         ]
     )
-    outcomes.to_csv(PROCESSED / "npb_2025_vs_mlb_2026_outcomes.csv", index=False, encoding="utf-8-sig")
+    outcomes.to_csv(
+        PROCESSED / f"npb_{NPB_REFERENCE_YEAR}_vs_mlb_{MLB_SEASON}_outcomes.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
 
-    npb_pitch = pd.read_csv(PROCESSED / "npb_basement_imai_pitch_values_2023_2025.csv")
-    npb_pitch = npb_pitch[npb_pitch["year"] == 2025].set_index("Type")
+    npb_pitch = pd.read_csv(PROCESSED / f"npb_basement_imai_pitch_values_{NPB_DETAIL_TAG}.csv")
+    npb_pitch = npb_pitch[npb_pitch["year"] == NPB_REFERENCE_YEAR].set_index("Type")
     mlb_pitch = pitch_summary.set_index("pitch_type")
     change_rows = []
     for code in ORDER:
@@ -424,7 +459,11 @@ def main() -> None:
             }
         )
     pitch_change = pd.DataFrame(change_rows)
-    pitch_change.to_csv(PROCESSED / "npb_2025_vs_mlb_2026_pitch_mix.csv", index=False, encoding="utf-8-sig")
+    pitch_change.to_csv(
+        PROCESSED / f"npb_{NPB_REFERENCE_YEAR}_vs_mlb_{MLB_SEASON}_pitch_mix.csv",
+        index=False,
+        encoding="utf-8-sig",
+    )
 
     terminal = statcast_all[statcast_all["events"].notna()]
     reconciliation = pd.DataFrame(
@@ -448,12 +487,12 @@ def main() -> None:
     pitch_index = pitch_summary.set_index("pitch_type")
     hand_index = platoon.set_index(["pitch_type", "stand"])
     summary = {
-        "cutoff": "2026-08-12",
+        "cutoff": END_DATE,
         "games": len(game_log),
         "starts": int((game_log["role"] == "先发").sum()),
         "relief_appearances": int((game_log["role"] == "牛棚").sum()),
         "innings": season_outs / 3,
-        "era": float(outcomes.loc[outcomes["level"] == "MLB 2026", "ERA"].iloc[0]),
+        "era": float(outcomes.loc[outcomes["level"] == MLB_LEVEL_LABEL, "ERA"].iloc[0]),
         "xera": float(expected_row["xera"]),
         "k_pct": 100 * mlb_k / mlb_bf,
         "bb_pct": 100 * mlb_bb / mlb_bf,
@@ -462,6 +501,11 @@ def main() -> None:
         "whiff_pct": 100 * pitches["whiff"].sum() / pitches["swing"].sum(),
         "chase_pct": 100 * (pitches["swing"] & ~pitches["zone_in"] & pitches["zone"].notna()).sum() / (~pitches["zone_in"] & pitches["zone"].notna()).sum(),
         "two_pitch_usage_pct": float(pitch_index.loc[["FF", "SL"], "usage_pct"].sum()),
+        "npb_reference_year": NPB_REFERENCE_YEAR,
+        "npb_reference_k_pct": float(npb_reference["K%"]),
+        "npb_reference_bb_pct": float(npb_reference["BB%"]),
+        "npb_changeup_usage_pct": float(npb_pitch.loc["CH", "Pitch%"]),
+        "npb_changeup_velocity_mph": float(npb_pitch.loc["CH", "Velo."] / 1.609344),
         "npb_2025_changeup_usage_pct": float(npb_pitch.loc["CH", "Pitch%"]),
         "mlb_changeup_usage_pct": float(pitch_index.loc["CH", "usage_pct"]),
         "npb_2025_changeup_velocity_mph": float(npb_pitch.loc["CH", "Velo."] / 1.609344),
@@ -473,21 +517,25 @@ def main() -> None:
         "relief_first_pitch_strike_pct": float(role_index.loc["牛棚", "first_pitch_strike_pct"]),
         "relief_whiff_pct": float(role_index.loc["牛棚", "whiff_pct"]),
         "relief_plate_appearances": int(role_index.loc["牛棚", "plate_appearances"]),
+        "decision_thresholds": DECISION_THRESHOLDS,
     }
     (PROCESSED / "analysis_summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
 
+    usage_low, usage_high = DECISION_THRESHOLDS["changeup_usage_pct_target"]
+    velocity_gap_low, velocity_gap_high = DECISION_THRESHOLDS["changeup_velocity_gap_mph_target"]
+    workload_steps = "→".join(str(value) for value in DECISION_THRESHOLDS["workload_pitch_steps"])
     analysis_cycles = f"""# 分析循环结果
 
 ## 循环 1：球威还是控球？
 
-- 结果：MLB K% 为 {summary['k_pct']:.1f}%，与 NPB 2025 的 27.8%基本一致；BB% 从 NPB 2025 的 7.0%升至 {summary['bb_pct']:.1f}%。
+- 结果：MLB K% 为 {summary['k_pct']:.1f}%，与 {NPB_LEVEL_LABEL} 的 {summary['npb_reference_k_pct']:.1f}%基本一致；BB% 从 {NPB_LEVEL_LABEL} 的 {summary['npb_reference_bb_pct']:.1f}%升至 {summary['bb_pct']:.1f}%。
 - 判断：H1“球威保留”和 H2“控球瓶颈”得到支持。不能把高ERA解释为单纯球威不足。
 
 ## 循环 2：是否只是二球种过度依赖？
 
-- 结果：MLB 四缝线+滑球占 {summary['two_pitch_usage_pct']:.1f}%；NPB 2025 变速球占 {summary['npb_2025_changeup_usage_pct']:.1f}%，MLB降至 {summary['mlb_changeup_usage_pct']:.1f}%。
-- 新发现：今井不是“没有第三球种”，而是迁移到MLB后基本失去了原本有效的变速球。NPB 2025 变速球 Whiff 41.6%、xPV/100 +1.03。
-- 修正：建议从“开发任意第三球种”改为“优先重建2025年已有证据的变速球”，并对小样本保持克制。
+- 结果：MLB 四缝线+滑球占 {summary['two_pitch_usage_pct']:.1f}%；{NPB_LEVEL_LABEL} 变速球占 {summary['npb_changeup_usage_pct']:.1f}%，MLB降至 {summary['mlb_changeup_usage_pct']:.1f}%。
+- 新发现：今井不是“没有第三球种”，而是迁移到MLB后基本失去了原本有效的变速球。{NPB_LEVEL_LABEL} 变速球 Whiff 41.6%、xPV/100 +1.03。
+- 修正：建议从“开发任意第三球种”改为“优先重建{NPB_REFERENCE_YEAR}年已有证据的变速球”，并对小样本保持克制。
 
 ## 循环 3：问题是否集中在特定对手？
 
@@ -502,7 +550,7 @@ def main() -> None:
 
 ## 最终研究判断
 
-主要问题不是球速或三振能力，而是控球回退、对左打四缝线效果不佳，以及NPB时期有效变速球的使用与速度差消失。短期保留多局牛棚以恢复首球好球和好球区率；中期重建对左打变速球；达到预设门槛后再重返先发。
+主要问题不是球速或三振能力，而是控球回退、对左打四缝线效果不佳，以及NPB时期有效变速球的使用与速度差消失。短期保留多局牛棚以恢复首球好球和好球区率；中期把变速球使用率带到 {usage_low:g}%—{usage_high:g}%、速度差带到 {velocity_gap_low:g}—{velocity_gap_high:g} mph；至少观察 {DECISION_THRESHOLDS['minimum_evaluation_plate_appearances']} 个打席，并以 Zone%≥{DECISION_THRESHOLDS['zone_pct_min']:g}%、首球好球率≥{DECISION_THRESHOLDS['first_pitch_strike_pct_min']:g}%、BB%≤{DECISION_THRESHOLDS['walk_pct_max']:g}%作为过程门槛，再进入 {workload_steps} 球负荷阶梯。
 """
     (RESEARCH / "analysis_cycle_results.md").write_text(analysis_cycles, encoding="utf-8")
 
