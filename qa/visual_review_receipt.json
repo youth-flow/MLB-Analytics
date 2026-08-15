@@ -1,0 +1,43 @@
+{
+  "status": "reviewed",
+  "reviewed_at": "2026-08-15T14:57:45+08:00",
+  "reviewer": "Codex（逐页原始分辨率视觉核查）",
+  "rendering": {
+    "engine": "LibreOffice 26.2.5.2",
+    "dpi": 150,
+    "page_image_format": "PNG"
+  },
+  "documents": [
+    {
+      "path": "reports/public/今井达也_MLB调整决策_正式文稿.docx",
+      "docx_sha256": "96511A9F91DDD512C98F79D0C12936B7B021A9DD5208829872D73D7684AF0C30",
+      "rendered_pdf": "qa/rendered/formal/今井达也_MLB调整决策_正式文稿.pdf",
+      "pdf_sha256": "8213BD42C5116D97393FD8923A431B126288D5FB927FD9D029A26E7BBD237DEC",
+      "pages": 2,
+      "pages_reviewed": [1, 2],
+      "checks": {
+        "no_clipping_or_overlap": true,
+        "tables_and_figure_readable": true,
+        "font_rendering_normal": true,
+        "page_breaks_acceptable": true,
+        "course_two_page_limit_met": true
+      }
+    },
+    {
+      "path": "reports/public/今井达也_MLB调整决策_完整分析底稿.docx",
+      "docx_sha256": "CD2EB93E95F7A6A8E0FF8A6FEA798A5485E3FCC2EEDE83615F3707903AA4B1DF",
+      "rendered_pdf": "qa/rendered/full/今井达也_MLB调整决策_完整分析底稿.pdf",
+      "pdf_sha256": "5FFF9750EA80DA6B78873824B93F3ED196BA274C84E3244A5C59F2E608532F64",
+      "pages": 10,
+      "pages_reviewed": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+      "checks": {
+        "no_clipping_or_overlap": true,
+        "tables_and_figures_readable": true,
+        "font_rendering_normal": true,
+        "page_breaks_acceptable": true,
+        "orphan_source_page_removed": true
+      }
+    }
+  ],
+  "scope_note": "本收据记录实际逐页视觉核查，不替代提交者对最终内容和签章材料的确认。"
+}

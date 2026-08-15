@@ -162,8 +162,8 @@ def rate_record(group: pd.DataFrame, games: int) -> dict[str, float]:
 
 def draw_panel(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int], title: str, font: ImageFont.FreeTypeFont) -> None:
     x0, y0, x1, y1 = box
-    draw.rounded_rectangle(box, radius=24, fill="#F7F9FC", outline="#D9E2EC", width=2)
-    draw.text((x0 + 28, y0 + 22), title, font=font, fill="#17324D")
+    draw.rectangle(box, fill="white", outline="#B8B8B8", width=2)
+    draw.text((x0 + 28, y0 + 22), title, font=font, fill="#222222")
 
 
 def font_candidates(bold: bool = False) -> list[Path]:
@@ -200,34 +200,34 @@ def grouped_bars(
     x0, y0, x1, y1 = box
     chart_top, chart_bottom = y0 + 70, y1 - 80
     chart_left, chart_right = x0 + 50, x1 - 25
-    draw.line((chart_left, chart_bottom, chart_right, chart_bottom), fill="#9FB3C8", width=2)
+    draw.line((chart_left, chart_bottom, chart_right, chart_bottom), fill="#8A8A8A", width=2)
     group_width = (chart_right - chart_left) / len(categories)
     bar_width = min(42, group_width / (len(series) + 1))
     for index, category in enumerate(categories):
         center = chart_left + group_width * (index + 0.5)
-        draw.text((center - 42, chart_bottom + 14), category, font=font(24), fill="#334E68")
+        draw.text((center - 42, chart_bottom + 14), category, font=font(24), fill="#222222")
         for s_index, (_, values, color) in enumerate(series):
             value = float(values[index])
             height = (chart_bottom - chart_top) * value / maximum
             left = center + (s_index - (len(series) - 1) / 2) * (bar_width + 8) - bar_width / 2
-            draw.rounded_rectangle((left, chart_bottom - height, left + bar_width, chart_bottom), radius=5, fill=color)
-            draw.text((left - 3, chart_bottom - height - 30), f"{value:.1f}{value_suffix}", font=font(18), fill="#243B53")
+            draw.rectangle((left, chart_bottom - height, left + bar_width, chart_bottom), fill=color)
+            draw.text((left - 3, chart_bottom - height - 30), f"{value:.1f}{value_suffix}", font=font(18), fill="#222222")
     legend_x = chart_left
     for name, _, color in series:
-        draw.rounded_rectangle((legend_x, y0 + 22, legend_x + 22, y0 + 44), radius=4, fill=color)
-        draw.text((legend_x + 30, y0 + 15), name, font=font(20), fill="#334E68")
+        draw.rectangle((legend_x, y0 + 22, legend_x + 22, y0 + 44), fill=color)
+        draw.text((legend_x + 30, y0 + 15), name, font=font(20), fill="#222222")
         legend_x += 170
 
 
 def make_core_figure(outcomes: pd.DataFrame, pitch_change: pd.DataFrame, pitch_summary: pd.DataFrame) -> None:
     image = Image.new("RGB", (1800, 1040), "white")
     draw = ImageDraw.Draw(image)
-    draw.text((70, 36), "诊断：三振能力保留，控球与球种结构发生退化", font=font(42, True), fill="#102A43")
+    draw.text((70, 36), "诊断：三振能力保留，控球与球种结构发生退化", font=font(42, True), fill="#111111")
     draw.text(
         (72, 92),
         f"{NPB_LEVEL_LABEL} 与 {MLB_LEVEL_LABEL}（截止 {CUTOFF_DISPLAY}）",
         font=font(24),
-        fill="#627D98",
+        fill="#555555",
     )
 
     left = (60, 145, 865, 655)
@@ -242,8 +242,8 @@ def make_core_figure(outcomes: pd.DataFrame, pitch_change: pd.DataFrame, pitch_s
         (85, 190, 840, 635),
         ["K%", "BB%", "K-BB%"],
         [
-            (NPB_LEVEL_LABEL, outcomes.loc[outcomes["level"] == NPB_LEVEL_LABEL, ["K_pct", "BB_pct", "K_minus_BB_pct"]].iloc[0].tolist(), "#2A9D8F"),
-            (MLB_LEVEL_LABEL, outcomes.loc[outcomes["level"] == MLB_LEVEL_LABEL, ["K_pct", "BB_pct", "K_minus_BB_pct"]].iloc[0].tolist(), "#E76F51"),
+            (NPB_LEVEL_LABEL, outcomes.loc[outcomes["level"] == NPB_LEVEL_LABEL, ["K_pct", "BB_pct", "K_minus_BB_pct"]].iloc[0].tolist(), "#A6A6A6"),
+            (MLB_LEVEL_LABEL, outcomes.loc[outcomes["level"] == MLB_LEVEL_LABEL, ["K_pct", "BB_pct", "K_minus_BB_pct"]].iloc[0].tolist(), "#2F5D7C"),
         ],
         maximum=32,
     )
@@ -254,27 +254,27 @@ def make_core_figure(outcomes: pd.DataFrame, pitch_change: pd.DataFrame, pitch_s
         (920, 190, 1715, 635),
         [PITCH_NAMES[code] for code in ["FF", "SL", "CH", "FS"]],
         [
-            (NPB_LEVEL_LABEL, [change.loc[code, "npb_usage_pct"] for code in ["FF", "SL", "CH", "FS"]], "#2A9D8F"),
-            (MLB_LEVEL_LABEL, [change.loc[code, "mlb_usage_pct"] for code in ["FF", "SL", "CH", "FS"]], "#E76F51"),
+            (NPB_LEVEL_LABEL, [change.loc[code, "npb_usage_pct"] for code in ["FF", "SL", "CH", "FS"]], "#A6A6A6"),
+            (MLB_LEVEL_LABEL, [change.loc[code, "mlb_usage_pct"] for code in ["FF", "SL", "CH", "FS"]], "#2F5D7C"),
         ],
         maximum=55,
     )
 
     arsenal = pitch_summary.set_index("pitch_type")
     cards = [
-        ("滑球", "SL", "#2A9D8F", "跨左右打者均维持正价值"),
-        ("四缝线", "FF", "#E76F51", "对左打：Whiff 15.4%，RV/100 -1.27"),
-        ("变速球", "CH", "#E9C46A", "29球小样本；应重建设计而非直接弃用"),
+        ("滑球", "SL", "跨左右打者均维持正价值"),
+        ("四缝线", "FF", "对左打：Whiff 15.4%，RV/100 -1.27"),
+        ("变速球", "CH", "29球小样本；应重建设计而非直接弃用"),
     ]
-    for index, (label, code, color, note) in enumerate(cards):
+    for index, (label, code, note) in enumerate(cards):
         x0 = 105 + index * 545
-        draw.rounded_rectangle((x0, 755, x0 + 500, 950), radius=20, fill="white", outline=color, width=4)
-        draw.text((x0 + 24, 775), label, font=font(30, True), fill=color)
+        draw.rectangle((x0, 755, x0 + 500, 950), fill="white", outline="#B8B8B8", width=2)
+        draw.text((x0 + 24, 775), label, font=font(30, True), fill="#2F5D7C")
         row = arsenal.loc[code]
-        draw.text((x0 + 24, 825), f"使用 {row['usage_pct']:.1f}%   Whiff {row['whiff_pct']:.1f}%", font=font(23), fill="#243B53")
+        draw.text((x0 + 24, 825), f"使用 {row['usage_pct']:.1f}%   Whiff {row['whiff_pct']:.1f}%", font=font(23), fill="#222222")
         if not math.isnan(float(row["official_xwoba"])):
-            draw.text((x0 + 24, 864), f"xwOBA {row['official_xwoba']:.3f}   RV {row['official_run_value']:+.0f}", font=font(23), fill="#243B53")
-        draw.text((x0 + 24, 910), note, font=font(19), fill="#627D98")
+            draw.text((x0 + 24, 864), f"xwOBA {row['official_xwoba']:.3f}   RV {row['official_run_value']:+.0f}", font=font(23), fill="#222222")
+        draw.text((x0 + 24, 910), note, font=font(19), fill="#555555")
 
     image.save(FIGURES / "figure_1_core_diagnosis.png", quality=95, dpi=(180, 180))
 
@@ -282,8 +282,8 @@ def make_core_figure(outcomes: pd.DataFrame, pitch_change: pd.DataFrame, pitch_s
 def make_role_figure(role_summary: pd.DataFrame, platoon: pd.DataFrame) -> None:
     image = Image.new("RGB", (1800, 930), "white")
     draw = ImageDraw.Draw(image)
-    draw.text((70, 36), "角色与侧别：牛棚改善是积极信号，但样本不足以证明永久转型", font=font(40, True), fill="#102A43")
-    draw.text((72, 91), "先发15场、1,151球；牛棚2场、89球", font=font(24), fill="#627D98")
+    draw.text((70, 36), "角色与侧别：牛棚改善是积极信号，但样本不足以证明永久转型", font=font(40, True), fill="#111111")
+    draw.text((72, 91), "先发15场、1,151球；牛棚2场、89球", font=font(24), fill="#555555")
     left = (60, 145, 1040, 835)
     right = (1070, 145, 1740, 835)
     draw_panel(draw, left, "过程指标：牛棚阶段更主动进入好球区", font(28, True))
@@ -295,29 +295,29 @@ def make_role_figure(role_summary: pd.DataFrame, platoon: pd.DataFrame) -> None:
         (90, 210, 1010, 710),
         ["Zone%", "首球好球%", "Whiff%", "Chase%"],
         [
-            ("先发", [role.loc["先发", "zone_pct"], role.loc["先发", "first_pitch_strike_pct"], role.loc["先发", "whiff_pct"], role.loc["先发", "chase_pct"]], "#457B9D"),
-            ("牛棚", [role.loc["牛棚", "zone_pct"], role.loc["牛棚", "first_pitch_strike_pct"], role.loc["牛棚", "whiff_pct"], role.loc["牛棚", "chase_pct"]], "#F4A261"),
+            ("先发", [role.loc["先发", "zone_pct"], role.loc["先发", "first_pitch_strike_pct"], role.loc["先发", "whiff_pct"], role.loc["先发", "chase_pct"]], "#A6A6A6"),
+            ("牛棚", [role.loc["牛棚", "zone_pct"], role.loc["牛棚", "first_pitch_strike_pct"], role.loc["牛棚", "whiff_pct"], role.loc["牛棚", "chase_pct"]], "#2F5D7C"),
         ],
         maximum=85,
     )
-    draw.text((105, 755), "注意：牛棚只有23个打席，置信区间较宽；该结果用于设定观察门槛，不作因果结论。", font=font(21), fill="#7B2D26")
+    draw.text((105, 755), "注意：牛棚只有23个打席，置信区间较宽；该结果用于设定观察门槛，不作因果结论。", font=font(21), fill="#444444")
 
     subset = platoon[platoon["pitch_type"].isin(["FF", "SL"])].copy()
     values = {(row.pitch_type, row.stand): row.rv100 for row in subset.itertuples()}
     chart_left, chart_right, zero_x = 1120, 1690, 1405
     chart_top, row_gap = 265, 125
     scale = 95
-    draw.line((zero_x, chart_top - 35, zero_x, chart_top + row_gap * 4 - 25), fill="#9FB3C8", width=3)
+    draw.line((zero_x, chart_top - 35, zero_x, chart_top + row_gap * 4 - 25), fill="#8A8A8A", width=3)
     rows = [("四缝线-左打", values[("FF", "L")]), ("四缝线-右打", values[("FF", "R")]), ("滑球-左打", values[("SL", "L")]), ("滑球-右打", values[("SL", "R")])]
     for idx, (label, value) in enumerate(rows):
         y = chart_top + idx * row_gap
-        draw.text((1120, y - 2), label, font=font(24), fill="#334E68")
+        draw.text((1120, y - 2), label, font=font(24), fill="#222222")
         end = zero_x + value * scale
-        color = "#2A9D8F" if value >= 0 else "#E76F51"
-        draw.rounded_rectangle((min(zero_x, end), y + 42, max(zero_x, end), y + 77), radius=8, fill=color)
+        color = "#2F5D7C" if value >= 0 else "#777777"
+        draw.rectangle((min(zero_x, end), y + 42, max(zero_x, end), y + 77), fill=color)
         draw.text((end + (10 if value >= 0 else -100), y + 37), f"{value:+.2f}", font=font(21, True), fill=color)
-    draw.text((1120, 748), "RV/100：正值对投手有利", font=font(21), fill="#627D98")
-    draw.text((1120, 786), "四缝线对左打Whiff仅15.4%", font=font(21), fill="#7B2D26")
+    draw.text((1120, 748), "RV/100：正值对投手有利", font=font(21), fill="#555555")
+    draw.text((1120, 786), "四缝线对左打Whiff仅15.4%", font=font(21), fill="#444444")
 
     image.save(FIGURES / "figure_2_role_platoon.png", quality=95, dpi=(180, 180))
 
@@ -539,6 +539,7 @@ def main() -> None:
     )
 
     usage_low, usage_high = DECISION_THRESHOLDS["changeup_usage_pct_target"]
+    velocity_gap_floor = DECISION_THRESHOLDS["changeup_velocity_gap_mph_floor"]
     velocity_gap_low, velocity_gap_high = DECISION_THRESHOLDS["changeup_velocity_gap_mph_target"]
     workload_steps = "→".join(str(value) for value in DECISION_THRESHOLDS["workload_pitch_steps"])
     analysis_cycles = f"""# 分析循环结果
@@ -567,7 +568,7 @@ def main() -> None:
 
 ## 最终研究判断
 
-主要问题不是球速或三振能力，而是控球回退、对左打四缝线效果不佳，以及NPB时期有效变速球的使用与速度差消失。短期保留多局牛棚以恢复首球好球和好球区率；中期把变速球使用率带到 {usage_low:g}%—{usage_high:g}%、速度差带到 {velocity_gap_low:g}—{velocity_gap_high:g} mph；至少观察 {DECISION_THRESHOLDS['minimum_evaluation_plate_appearances']} 个打席，并以 Zone%≥{DECISION_THRESHOLDS['zone_pct_min']:g}%、首球好球率≥{DECISION_THRESHOLDS['first_pitch_strike_pct_min']:g}%、BB%≤{DECISION_THRESHOLDS['walk_pct_max']:g}%作为过程门槛，再进入 {workload_steps} 球负荷阶梯。
+主要问题不是球速或三振能力，而是控球回退、对左打四缝线效果不佳，以及NPB时期有效变速球的使用与速度差收窄。短期保留多局牛棚以恢复首球好球和好球区率；中期把变速球使用率带到 {usage_low:g}%—{usage_high:g}%，速度差不再低于约 {velocity_gap_floor:g} mph并尝试向 {velocity_gap_low:g}—{velocity_gap_high:g} mph恢复，同时核对落点、移动和接触质量；至少观察 {DECISION_THRESHOLDS['minimum_evaluation_plate_appearances']} 个打席，并以 Zone%≥{DECISION_THRESHOLDS['zone_pct_min']:g}%、首球好球率≥{DECISION_THRESHOLDS['first_pitch_strike_pct_min']:g}%、BB%≤{DECISION_THRESHOLDS['walk_pct_max']:g}%作为过程门槛，再进入 {workload_steps} 球负荷阶梯。
 """
     (RESEARCH / "analysis_cycle_results.md").write_text(
         analysis_cycles,

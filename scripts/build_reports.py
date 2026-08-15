@@ -1,9 +1,11 @@
 """Build the two public course DOCX files from their Markdown sources.
 
 The public documents intentionally use a plain Chinese Word layout: A4 paper,
-black text on white, SimSun body text, SimHei headings, simple captions, and a
-centered page number.  Both files are built directly from ``reports/sources``
-so the Markdown remains the single source of truth.
+black text on white, restrained headings, simple tables/captions, and a centered
+page number.  The two-page course manuscript follows the specified 9 pt
+Microsoft YaHei body format; the long supporting draft uses 12 pt SimSun.
+Both files are built directly from ``reports/sources`` so the Markdown remains
+the single source of truth.
 
 The final DOCX archives are normalized after saving.  Core properties and ZIP
 entry timestamps are fixed so rebuilding an unchanged checkout is byte-stable.
@@ -17,6 +19,7 @@ from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 from docx import Document
+from docx.enum.table import WD_CELL_VERTICAL_ALIGNMENT, WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -34,14 +37,16 @@ FULL_SOURCE = SOURCES / "full_analysis_draft.md"
 FORMAL = PUBLIC / "今井达也_MLB调整决策_正式文稿.docx"
 FULL = PUBLIC / "今井达也_MLB调整决策_完整分析底稿.docx"
 
-BODY_FONT = "宋体"
+FORMAL_BODY_FONT = "Microsoft YaHei"
+FULL_BODY_FONT = "宋体"
 HEADING_FONT = "黑体"
 BLACK = "000000"
+TABLE_HEADER_FILL = "D9D9D9"
 FIXED_DATETIME = datetime(2026, 8, 12, 0, 0, 0)
 FIXED_ZIP_TIME = (2026, 8, 12, 0, 0, 0)
 
 
-def set_run_font(run, size: float, *, bold: bool = False, font: str = BODY_FONT) -> None:
+def set_run_font(run, size: float, *, bold: bool = False, font: str = FULL_BODY_FONT) -> None:
     """Apply explicit black Chinese typography to a run."""
     run.font.name = font
     r_fonts = run._element.get_or_add_rPr().get_or_add_rFonts()
@@ -52,7 +57,7 @@ def set_run_font(run, size: float, *, bold: bool = False, font: str = BODY_FONT)
     run.font.color.rgb = RGBColor.from_string(BLACK)
 
 
-def set_style_font(style, size: float, *, bold: bool = False, font: str = BODY_FONT) -> None:
+def set_style_font(style, size: float, *, bold: bool = False, font: str = FULL_BODY_FONT) -> None:
     style.font.name = font
     r_pr = style._element.get_or_add_rPr()
     r_fonts = r_pr.get_or_add_rFonts()
@@ -63,10 +68,17 @@ def set_style_font(style, size: float, *, bold: bool = False, font: str = BODY_F
     style.font.color.rgb = RGBColor.from_string(BLACK)
 
 
-def configure_styles(doc: Document, *, body_size: float, line_spacing: float, compact: bool) -> None:
+def configure_styles(
+    doc: Document,
+    *,
+    body_size: float,
+    body_font: str,
+    line_spacing: float,
+    compact: bool,
+) -> None:
     """Resolve every used Word style to explicit plain-layout tokens."""
     normal = doc.styles["Normal"]
-    set_style_font(normal, body_size)
+    set_style_font(normal, body_size, font=body_font)
     normal.paragraph_format.space_before = Pt(0)
     normal.paragraph_format.space_after = Pt(2 if compact else 4)
     normal.paragraph_format.line_spacing = line_spacing
@@ -95,13 +107,13 @@ def configure_styles(doc: Document, *, body_size: float, line_spacing: float, co
         style.paragraph_format.keep_together = True
 
     caption = doc.styles["Caption"]
-    set_style_font(caption, 8.5 if compact else 9)
+    set_style_font(caption, 9, font=body_font)
     caption.paragraph_format.space_before = Pt(2)
     caption.paragraph_format.space_after = Pt(4 if compact else 6)
     caption.paragraph_format.line_spacing = 1.0
 
 
-def add_page_number(section, *, size: float) -> None:
+def add_page_number(section, *, size: float, font: str) -> None:
     """Add a centered PAGE field and leave the header empty."""
     section.header.is_linked_to_previous = False
     header = section.header.paragraphs[0]
@@ -115,7 +127,7 @@ def add_page_number(section, *, size: float) -> None:
     footer.paragraph_format.space_after = Pt(0)
 
     run = footer.add_run()
-    set_run_font(run, size)
+    set_run_font(run, size, font=font)
     begin = OxmlElement("w:fldChar")
     begin.set(qn("w:fldCharType"), "begin")
     instr = OxmlElement("w:instrText")
@@ -132,10 +144,21 @@ def add_page_number(section, *, size: float) -> None:
 
 
 def setup_document(
-    *, body_size: float, line_spacing: float, margins_cm: tuple[float, float, float, float], compact: bool
+    *,
+    body_size: float,
+    body_font: str,
+    line_spacing: float,
+    margins_cm: tuple[float, float, float, float],
+    compact: bool,
 ) -> Document:
     doc = Document()
-    configure_styles(doc, body_size=body_size, line_spacing=line_spacing, compact=compact)
+    configure_styles(
+        doc,
+        body_size=body_size,
+        body_font=body_font,
+        line_spacing=line_spacing,
+        compact=compact,
+    )
     for section in doc.sections:
         section.page_width = Cm(21.0)
         section.page_height = Cm(29.7)
@@ -145,11 +168,18 @@ def setup_document(
         section.left_margin = Cm(margins_cm[3])
         section.header_distance = Cm(0.5)
         section.footer_distance = Cm(0.8)
-        add_page_number(section, size=8.5 if compact else 9)
+        add_page_number(section, size=9, font=body_font)
     return doc
 
 
-def add_inline_markup(paragraph, text: str, *, size: float, default_bold: bool = False) -> None:
+def add_inline_markup(
+    paragraph,
+    text: str,
+    *,
+    size: float,
+    font: str,
+    default_bold: bool = False,
+) -> None:
     """Render the small Markdown subset used by the sources."""
     parts = re.split(r"(\*\*.*?\*\*|`.*?`)", text)
     for part in parts:
@@ -157,13 +187,13 @@ def add_inline_markup(paragraph, text: str, *, size: float, default_bold: bool =
             continue
         if part.startswith("**") and part.endswith("**"):
             run = paragraph.add_run(part[2:-2])
-            set_run_font(run, size, bold=True)
+            set_run_font(run, size, bold=True, font=font)
         elif part.startswith("`") and part.endswith("`"):
             run = paragraph.add_run(part[1:-1])
-            set_run_font(run, max(size - 0.5, 8.5))
+            set_run_font(run, max(size - 0.5, 8.5), font=font)
         else:
             run = paragraph.add_run(part)
-            set_run_font(run, size, bold=default_bold)
+            set_run_font(run, size, bold=default_bold, font=font)
 
 
 def add_title(doc: Document, text: str, *, subtitle: bool = False) -> None:
@@ -185,13 +215,13 @@ def add_heading(doc: Document, text: str, *, level: int, compact: bool) -> None:
     set_run_font(run, size_map[level], bold=True, font=HEADING_FONT)
 
 
-def add_metadata(doc: Document, text: str, *, size: float) -> None:
+def add_metadata(doc: Document, text: str, *, size: float, font: str) -> None:
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.paragraph_format.space_after = Pt(3)
     p.paragraph_format.line_spacing = 1.0
     run = p.add_run(text.rstrip())
-    set_run_font(run, size)
+    set_run_font(run, size, font=font)
 
 
 def add_prose(
@@ -199,6 +229,7 @@ def add_prose(
     text: str,
     *,
     size: float,
+    font: str,
     line_spacing: float,
     compact: bool,
     indent: bool = True,
@@ -210,7 +241,7 @@ def add_prose(
     p.paragraph_format.line_spacing = line_spacing
     p.paragraph_format.first_line_indent = Pt(size * 2) if indent else Pt(0)
     p.paragraph_format.widow_control = True
-    add_inline_markup(p, text, size=size, default_bold=bold)
+    add_inline_markup(p, text, size=size, font=font, default_bold=bold)
 
 
 def _next_numbering_id(numbering) -> tuple[int, int]:
@@ -268,6 +299,7 @@ def add_list_item(
     *,
     num_id: int,
     size: float,
+    font: str,
     line_spacing: float,
     compact: bool,
 ) -> None:
@@ -281,10 +313,18 @@ def add_list_item(
     num = OxmlElement("w:numId")
     num.set(qn("w:val"), str(num_id))
     num_pr.extend((ilvl, num))
-    add_inline_markup(p, text, size=size)
+    add_inline_markup(p, text, size=size, font=font)
 
 
-def add_figure(doc: Document, path: Path, caption: str, *, width_cm: float, compact: bool) -> None:
+def add_figure(
+    doc: Document,
+    path: Path,
+    caption: str,
+    *,
+    width_cm: float,
+    compact: bool,
+    font: str,
+) -> None:
     p = doc.add_paragraph()
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.paragraph_format.space_before = Pt(2)
@@ -294,7 +334,165 @@ def add_figure(doc: Document, path: Path, caption: str, *, width_cm: float, comp
     c = doc.add_paragraph(style="Caption")
     c.alignment = WD_ALIGN_PARAGRAPH.CENTER
     run = c.add_run(caption)
-    set_run_font(run, 8.5 if compact else 9)
+    set_run_font(run, 9, font=font)
+
+
+def _cm_to_dxa(value: float) -> int:
+    return int(round(value / 2.54 * 1440))
+
+
+def _set_cell_margins(cell, *, top: int = 60, start: int = 100, bottom: int = 60, end: int = 100) -> None:
+    tc_pr = cell._tc.get_or_add_tcPr()
+    tc_mar = tc_pr.first_child_found_in("w:tcMar")
+    if tc_mar is None:
+        tc_mar = OxmlElement("w:tcMar")
+        tc_pr.append(tc_mar)
+    for side, value in (("top", top), ("start", start), ("bottom", bottom), ("end", end)):
+        node = tc_mar.find(qn(f"w:{side}"))
+        if node is None:
+            node = OxmlElement(f"w:{side}")
+            tc_mar.append(node)
+        node.set(qn("w:w"), str(value))
+        node.set(qn("w:type"), "dxa")
+
+
+def _set_table_geometry(table, widths_cm: list[float]) -> None:
+    """Apply fixed DXA geometry so Word and LibreOffice agree on widths."""
+    widths_dxa = [_cm_to_dxa(width) for width in widths_cm]
+    total_dxa = sum(widths_dxa)
+    table.autofit = False
+    table.alignment = WD_TABLE_ALIGNMENT.LEFT
+    tbl_pr = table._tbl.tblPr
+
+    tbl_width = tbl_pr.first_child_found_in("w:tblW")
+    if tbl_width is None:
+        tbl_width = OxmlElement("w:tblW")
+        tbl_pr.append(tbl_width)
+    tbl_width.set(qn("w:w"), str(total_dxa))
+    tbl_width.set(qn("w:type"), "dxa")
+
+    tbl_ind = tbl_pr.first_child_found_in("w:tblInd")
+    if tbl_ind is None:
+        tbl_ind = OxmlElement("w:tblInd")
+        tbl_pr.append(tbl_ind)
+    tbl_ind.set(qn("w:w"), "100")
+    tbl_ind.set(qn("w:type"), "dxa")
+
+    layout = tbl_pr.first_child_found_in("w:tblLayout")
+    if layout is None:
+        layout = OxmlElement("w:tblLayout")
+        tbl_pr.append(layout)
+    layout.set(qn("w:type"), "fixed")
+
+    borders = tbl_pr.first_child_found_in("w:tblBorders")
+    if borders is None:
+        borders = OxmlElement("w:tblBorders")
+        tbl_pr.append(borders)
+    for edge in ("top", "left", "bottom", "right", "insideH", "insideV"):
+        border = borders.find(qn(f"w:{edge}"))
+        if border is None:
+            border = OxmlElement(f"w:{edge}")
+            borders.append(border)
+        border.set(qn("w:val"), "single")
+        border.set(qn("w:sz"), "4")
+        border.set(qn("w:space"), "0")
+        border.set(qn("w:color"), "808080")
+
+    grid = table._tbl.tblGrid
+    for child in list(grid):
+        grid.remove(child)
+    for width in widths_dxa:
+        column = OxmlElement("w:gridCol")
+        column.set(qn("w:w"), str(width))
+        grid.append(column)
+
+    for row in table.rows:
+        cant_split = OxmlElement("w:cantSplit")
+        row._tr.get_or_add_trPr().append(cant_split)
+        for index, cell in enumerate(row.cells):
+            cell.width = Cm(widths_cm[index])
+            cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+            tc_width = cell._tc.get_or_add_tcPr().first_child_found_in("w:tcW")
+            if tc_width is None:
+                tc_width = OxmlElement("w:tcW")
+                cell._tc.get_or_add_tcPr().append(tc_width)
+            tc_width.set(qn("w:w"), str(widths_dxa[index]))
+            tc_width.set(qn("w:type"), "dxa")
+            _set_cell_margins(cell)
+
+
+def _table_widths(column_count: int, usable_width_cm: float) -> list[float]:
+    ratios = {
+        2: [0.24, 0.76],
+        3: [0.18, 0.50, 0.32],
+        4: [0.14, 0.25, 0.31, 0.30],
+    }.get(column_count, [1 / column_count] * column_count)
+    widths = [round(usable_width_cm * ratio, 3) for ratio in ratios]
+    widths[-1] = round(usable_width_cm - sum(widths[:-1]), 3)
+    return widths
+
+
+def add_markdown_table(
+    doc: Document,
+    rows: list[list[str]],
+    *,
+    size: float,
+    font: str,
+    usable_width_cm: float,
+    line_spacing: float,
+) -> None:
+    if not rows or not rows[0]:
+        return
+    column_count = len(rows[0])
+    if any(len(row) != column_count for row in rows):
+        raise ValueError("Markdown table rows must have a consistent column count")
+    table = doc.add_table(rows=len(rows), cols=column_count)
+    _set_table_geometry(table, _table_widths(column_count, usable_width_cm))
+    table.rows[0]._tr.get_or_add_trPr().append(OxmlElement("w:tblHeader"))
+
+    for row_index, values in enumerate(rows):
+        for column_index, value in enumerate(values):
+            cell = table.cell(row_index, column_index)
+            if row_index == 0:
+                shading = OxmlElement("w:shd")
+                shading.set(qn("w:val"), "clear")
+                shading.set(qn("w:color"), "auto")
+                shading.set(qn("w:fill"), TABLE_HEADER_FILL)
+                cell._tc.get_or_add_tcPr().append(shading)
+            paragraph = cell.paragraphs[0]
+            paragraph.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            paragraph.paragraph_format.space_before = Pt(0)
+            paragraph.paragraph_format.space_after = Pt(0)
+            paragraph.paragraph_format.line_spacing = line_spacing
+            add_inline_markup(
+                paragraph,
+                value,
+                size=size,
+                font=font,
+                default_bold=row_index == 0,
+            )
+    spacer = doc.add_paragraph(style="Normal")
+    spacer.paragraph_format.space_before = Pt(0)
+    spacer.paragraph_format.space_after = Pt(2)
+
+
+def parse_markdown_table(lines: list[str], start: int) -> tuple[list[list[str]], int] | None:
+    """Return table rows and the first unconsumed line, or ``None``."""
+    if start + 1 >= len(lines):
+        return None
+    first = lines[start].strip()
+    separator = lines[start + 1].strip()
+    if not (first.startswith("|") and separator.startswith("|")):
+        return None
+    separator_cells = [cell.strip() for cell in separator.strip("|").split("|")]
+    if not separator_cells or not all(re.fullmatch(r":?-{3,}:?", cell) for cell in separator_cells):
+        return None
+    rows = [[cell.strip() for cell in first.strip("|").split("|")]]
+    index = start + 2
+    while index < len(lines) and lines[index].strip().startswith("|"):
+        rows.append([cell.strip() for cell in lines[index].strip().strip("|").split("|")])
+        index += 1
+    return rows, index
 
 
 def set_public_core_properties(doc: Document, *, title: str, subject: str) -> None:
@@ -346,17 +544,33 @@ def save_public_docx(doc: Document, path: Path, *, title: str, subject: str) -> 
 
 def build_formal() -> None:
     doc = setup_document(
-        body_size=10.5,
-        line_spacing=1.2,
+        body_size=9,
+        body_font=FORMAL_BODY_FONT,
+        line_spacing=1.1,
         margins_cm=(1.9, 2.0, 1.9, 2.0),
         compact=True,
     )
     lines = FORMAL_SOURCE.read_text(encoding="utf-8").splitlines()
     current_list: int | None = None
     inserted_figure = False
+    index = 0
 
-    for raw in lines:
-        line = raw.strip()
+    while index < len(lines):
+        table_data = parse_markdown_table(lines, index)
+        if table_data is not None:
+            rows, index = table_data
+            add_markdown_table(
+                doc,
+                rows,
+                size=9,
+                font=FORMAL_BODY_FONT,
+                usable_width_cm=17.0,
+                line_spacing=1.0,
+            )
+            current_list = None
+            continue
+        line = lines[index].strip()
+        index += 1
         if not line:
             current_list = None
             continue
@@ -374,13 +588,14 @@ def build_formal() -> None:
                         "图1  NPB 2025与MLB 2026核心诊断。跨联盟球种价值仅比较方向。",
                         width_cm=15.5,
                         compact=True,
+                        font=FORMAL_BODY_FONT,
                     )
                     inserted_figure = True
                 doc.add_page_break()
             add_heading(doc, heading, level=1, compact=True)
             current_list = None
         elif line.startswith("公开版"):
-            add_metadata(doc, line, size=9.5)
+            add_metadata(doc, line, size=9, font=FORMAL_BODY_FONT)
         elif re.match(r"^\d+\.\s+", line):
             if current_list is None:
                 current_list = create_numbering(doc, bullet=False)
@@ -389,16 +604,18 @@ def build_formal() -> None:
                 doc,
                 text,
                 num_id=current_list,
-                size=10.0,
-                line_spacing=1.15,
+                size=9,
+                font=FORMAL_BODY_FONT,
+                line_spacing=1.1,
                 compact=True,
             )
         elif line.startswith("数据来源："):
             add_prose(
                 doc,
                 line,
-                size=8.5,
-                line_spacing=1.1,
+                size=9,
+                font=FORMAL_BODY_FONT,
+                line_spacing=1.0,
                 compact=True,
                 indent=False,
             )
@@ -407,8 +624,9 @@ def build_formal() -> None:
             add_prose(
                 doc,
                 line,
-                size=10.5,
-                line_spacing=1.2,
+                size=9,
+                font=FORMAL_BODY_FONT,
+                line_spacing=1.1,
                 compact=True,
                 indent=not line.startswith("**"),
             )
@@ -425,6 +643,7 @@ def build_formal() -> None:
 def build_full() -> None:
     doc = setup_document(
         body_size=12,
+        body_font=FULL_BODY_FONT,
         line_spacing=1.5,
         margins_cm=(2.5, 2.5, 2.5, 2.5),
         compact=False,
@@ -436,8 +655,24 @@ def build_full() -> None:
     inserted_fig1 = False
     inserted_fig2 = False
 
-    for raw in lines:
-        line = raw.strip()
+    index = 0
+    while index < len(lines):
+        table_data = parse_markdown_table(lines, index)
+        if table_data is not None:
+            rows, index = table_data
+            add_markdown_table(
+                doc,
+                rows,
+                size=10.5,
+                font=FULL_BODY_FONT,
+                usable_width_cm=16.0,
+                line_spacing=1.2,
+            )
+            number_list = None
+            bullet_list = None
+            continue
+        line = lines[index].strip()
+        index += 1
         if not line:
             number_list = None
             bullet_list = None
@@ -456,7 +691,7 @@ def build_full() -> None:
             number_list = None
             bullet_list = None
         elif line.startswith(("公开版本：", "研究冻结日：", "项目目录：")):
-            add_metadata(doc, line.rstrip(), size=10.5)
+            add_metadata(doc, line.rstrip(), size=10.5, font=FULL_BODY_FONT)
         elif line.startswith("- "):
             if bullet_list is None:
                 bullet_list = create_numbering(doc, bullet=True)
@@ -465,6 +700,7 @@ def build_full() -> None:
                 line[2:],
                 num_id=bullet_list,
                 size=12,
+                font=FULL_BODY_FONT,
                 line_spacing=1.5,
                 compact=False,
             )
@@ -478,6 +714,7 @@ def build_full() -> None:
                 text,
                 num_id=number_list,
                 size=12,
+                font=FULL_BODY_FONT,
                 line_spacing=1.5,
                 compact=False,
             )
@@ -487,6 +724,7 @@ def build_full() -> None:
                 doc,
                 line,
                 size=12,
+                font=FULL_BODY_FONT,
                 line_spacing=1.5,
                 compact=False,
                 indent=not line.startswith("**"),
@@ -501,6 +739,7 @@ def build_full() -> None:
                 "图1  核心诊断：三振能力保留，控球与球种结构退化。",
                 width_cm=15.5,
                 compact=False,
+                font=FULL_BODY_FONT,
             )
             inserted_fig1 = True
         if line.startswith("结论：牛棚是重新练习") and not inserted_fig2:
@@ -510,6 +749,7 @@ def build_full() -> None:
                 "图2  角色与侧别：牛棚信号积极但样本有限，四缝线问题集中于左打。",
                 width_cm=15.5,
                 compact=False,
+                font=FULL_BODY_FONT,
             )
             inserted_fig2 = True
 

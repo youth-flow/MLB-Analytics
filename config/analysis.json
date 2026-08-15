@@ -22,7 +22,8 @@
     "walk_pct_max": 10.0,
     "fallback_walk_pct": 12.0,
     "changeup_usage_pct_target": [8.0, 12.0],
-    "changeup_velocity_gap_mph_target": [8.0, 10.0],
+    "changeup_velocity_gap_mph_floor": 8.0,
+    "changeup_velocity_gap_mph_target": [9.0, 10.0],
     "workload_pitch_steps": [45, 60, 75]
   },
   "data_policy": {

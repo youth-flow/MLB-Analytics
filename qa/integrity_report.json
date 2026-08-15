@@ -71,19 +71,32 @@
       ],
       "contains_title": true,
       "normal_style_chinese_fonts": [
-        "宋体"
+        "Microsoft YaHei"
+      ],
+      "normal_style_sizes_half_points": [
+        "18"
       ],
       "plain_style": true,
       "plain_style_evidence": {
         "direct_nonblack_text_colors": [],
-        "nonwhite_shading_fills": [],
+        "nonwhite_shading_fills": [
+          "D9D9D9"
+        ],
         "page_backgrounds": 0,
         "page_borders": 0,
         "legacy_shapes": 0
       },
       "embedded_images": 1,
       "expected_images_at_least": 1,
-      "thesis_paragraph_bold": true
+      "thesis_paragraph_bold": true,
+      "course_format": {
+        "required": true,
+        "body_runs_checked": 8,
+        "body_runs_9pt_microsoft_yahei": true,
+        "table_runs_checked": 15,
+        "table_runs_9pt_microsoft_yahei": true,
+        "caption_style_9pt_microsoft_yahei": true
+      }
     },
     "full_draft_docx": {
       "path": "reports/public/今井达也_MLB调整决策_完整分析底稿.docx",
@@ -101,17 +114,30 @@
       "normal_style_chinese_fonts": [
         "宋体"
       ],
+      "normal_style_sizes_half_points": [
+        "24"
+      ],
       "plain_style": true,
       "plain_style_evidence": {
         "direct_nonblack_text_colors": [],
-        "nonwhite_shading_fills": [],
+        "nonwhite_shading_fills": [
+          "D9D9D9"
+        ],
         "page_backgrounds": 0,
         "page_borders": 0,
         "legacy_shapes": 0
       },
       "embedded_images": 2,
       "expected_images_at_least": 2,
-      "thesis_paragraph_bold": false
+      "thesis_paragraph_bold": false,
+      "course_format": {
+        "required": false,
+        "body_runs_checked": 94,
+        "body_runs_9pt_microsoft_yahei": false,
+        "table_runs_checked": 68,
+        "table_runs_9pt_microsoft_yahei": false,
+        "caption_style_9pt_microsoft_yahei": false
+      }
     },
     "public_pii_scan": {
       "status": "passed",
@@ -121,7 +147,7 @@
     "artifact_manifest": {
       "status": "passed",
       "entries": 45,
-      "manifest_sha256": "fa20adb5bde53c152c8f02865f55bf4fdaf8e27707c2160048053572b5a7cdec",
+      "manifest_sha256": "eb118f81b8fa3edf3965ae4ac67fcff76ac9eeeda9411a96243e5c2dc505d373",
       "excluded_path_leaks": [],
       "deterministic_order": true
     },

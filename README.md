@@ -86,6 +86,8 @@ python scripts/verify_project.py
 
 默认流水线不读取本地渲染缓存，因而在 clean clone 中保持确定性。提交前的页数与视觉检查需另行完成 DOCX→PDF→逐页图片渲染，并运行 `python scripts/verify_project.py --require-visual`；平台差异和完整步骤见 [`docs/reproducibility.md`](docs/reproducibility.md)。
 
+自动报告中的`overall_pass=true`仅表示离线数据、代码与文档结构门禁通过；只有正式稿/底稿页数符合预期并且真实逐页检查已有记录时，`submission_ready`才可能为`true`。仓库不会从“PDF 可以生成”自动推断“版面已人工看过”。
+
 ### 显式刷新联网数据
 
 只有需要建立新的数据冻结点时才执行：
@@ -100,8 +102,8 @@ GitHub Actions 对每次 push 和 pull request 运行相同的冻结离线流程
 
 ## 主要交付物
 
-- [`reports/sources/formal_manuscript.md`](reports/sources/formal_manuscript.md)：两页正式稿的可审查文本源。
-- [`reports/sources/full_analysis_draft.md`](reports/sources/full_analysis_draft.md)：完整分析底稿文本源。
+- [`reports/sources/formal_manuscript.md`](reports/sources/formal_manuscript.md)：两页正式稿的可审查文本源；构建版为 A4，正文、表格和图注统一 9pt 微软雅黑，首个结论段整段加粗。
+- [`reports/sources/full_analysis_draft.md`](reports/sources/full_analysis_draft.md)：完整分析底稿文本源，保留分子分母、分组口径、分析循环、反证、停止规则与复现路径。
 - [`reports/public/今井达也_MLB调整决策_正式文稿.docx`](reports/public/今井达也_MLB调整决策_正式文稿.docx)：课程正式文稿。
 - [`reports/public/今井达也_MLB调整决策_完整分析底稿.docx`](reports/public/今井达也_MLB调整决策_完整分析底稿.docx)：完整分析底稿。
 - [`qa/data_reconciliation.csv`](qa/data_reconciliation.csv)：逐球数据与官方比赛日志对账。

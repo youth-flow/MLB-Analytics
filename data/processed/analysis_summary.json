@@ -39,8 +39,9 @@
       8.0,
       12.0
     ],
+    "changeup_velocity_gap_mph_floor": 8.0,
     "changeup_velocity_gap_mph_target": [
-      8.0,
+      9.0,
       10.0
     ],
     "workload_pitch_steps": [

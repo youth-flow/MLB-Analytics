@@ -281,8 +281,15 @@ def _compact_text(value: str) -> str:
     return re.sub(r"\s+", "", value).replace("？", "").replace("?", "")
 
 
-def inspect_docx(path: Path, expected_images: int = 0) -> dict:
-    """Inspect A4 geometry, title, embedded figures, and a restrained style policy."""
+def inspect_docx(
+    path: Path,
+    expected_images: int = 0,
+    *,
+    expected_normal_font: str | None = None,
+    expected_normal_size_half_points: int | None = None,
+    enforce_formal_course_format: bool = False,
+) -> dict:
+    """Inspect geometry, typography, figures, and a restrained style policy."""
 
     base = {
         "path": path.relative_to(ROOT).as_posix() if path.is_absolute() and ROOT in path.parents else path.as_posix(),
@@ -317,6 +324,18 @@ def inspect_docx(path: Path, expected_images: int = 0) -> dict:
     )
     if not normal_fonts:
         normal_fonts = styles_xml.xpath("//w:docDefaults//w:rFonts/@w:eastAsia", namespaces=NS)
+    normal_sizes = styles_xml.xpath(
+        "//w:style[@w:styleId='Normal']/w:rPr/w:sz/@w:val",
+        namespaces=NS,
+    )
+    caption_fonts = styles_xml.xpath(
+        "//w:style[@w:styleId='Caption']/w:rPr/w:rFonts/@w:eastAsia",
+        namespaces=NS,
+    )
+    caption_sizes = styles_xml.xpath(
+        "//w:style[@w:styleId='Caption']/w:rPr/w:sz/@w:val",
+        namespaces=NS,
+    )
 
     direct_colors = {
         value.upper()
@@ -345,6 +364,26 @@ def inspect_docx(path: Path, expected_images: int = 0) -> dict:
         for run in thesis_nodes[0].xpath(".//w:r", namespaces=NS)
         if run.xpath(".//w:t", namespaces=NS)
     )
+
+    formal_body_runs = document_xml.xpath(
+        "//w:body/w:p[(not(w:pPr/w:pStyle) or w:pPr/w:pStyle/@w:val='Normal')]"
+        "/w:r[.//w:t]",
+        namespaces=NS,
+    )
+    formal_table_runs = document_xml.xpath("//w:tbl//w:r[.//w:t]", namespaces=NS)
+
+    def run_matches_course_format(run) -> bool:
+        fonts = run.xpath("w:rPr/w:rFonts/@w:eastAsia", namespaces=NS)
+        sizes = run.xpath("w:rPr/w:sz/@w:val", namespaces=NS)
+        return fonts == ["Microsoft YaHei"] and sizes == ["18"]
+
+    formal_body_format_ok = bool(formal_body_runs) and all(
+        run_matches_course_format(run) for run in formal_body_runs
+    )
+    formal_table_format_ok = bool(formal_table_runs) and all(
+        run_matches_course_format(run) for run in formal_table_runs
+    )
+    formal_caption_format_ok = caption_fonts == ["Microsoft YaHei"] and caption_sizes == ["18"]
     errors: list[str] = []
     if not a4_geometry:
         errors.append("not_a4_portrait")
@@ -352,10 +391,25 @@ def inspect_docx(path: Path, expected_images: int = 0) -> dict:
         errors.append("missing_expected_title")
     if not normal_fonts:
         errors.append("missing_normal_style_chinese_font")
+    if expected_normal_font and normal_fonts != [expected_normal_font]:
+        errors.append(f"normal_font:{normal_fonts!r}!=expected:{expected_normal_font}")
+    if expected_normal_size_half_points is not None and normal_sizes != [str(expected_normal_size_half_points)]:
+        errors.append(
+            f"normal_size:{normal_sizes!r}!=expected_half_points:{expected_normal_size_half_points}"
+        )
     if not plain_style:
         errors.append("plain_style_policy_failed")
     if len(media_files) < expected_images:
         errors.append(f"embedded_images:{len(media_files)}<expected:{expected_images}")
+    if enforce_formal_course_format:
+        if not thesis_bold:
+            errors.append("conclusion_first_paragraph_not_bold")
+        if not formal_body_format_ok:
+            errors.append("formal_body_runs_not_9pt_microsoft_yahei")
+        if not formal_table_format_ok:
+            errors.append("formal_table_runs_not_9pt_microsoft_yahei_or_missing_table")
+        if not formal_caption_format_ok:
+            errors.append("formal_caption_style_not_9pt_microsoft_yahei")
 
     return {
         **base,
@@ -365,6 +419,7 @@ def inspect_docx(path: Path, expected_images: int = 0) -> dict:
         "page_sizes_twips": [{"width": width, "height": height} for width, height in geometry],
         "contains_title": contains_title,
         "normal_style_chinese_fonts": sorted(set(normal_fonts)),
+        "normal_style_sizes_half_points": sorted(set(normal_sizes)),
         "plain_style": plain_style,
         "plain_style_evidence": {
             "direct_nonblack_text_colors": sorted(direct_colors),
@@ -376,6 +431,14 @@ def inspect_docx(path: Path, expected_images: int = 0) -> dict:
         "embedded_images": len(media_files),
         "expected_images_at_least": expected_images,
         "thesis_paragraph_bold": thesis_bold,
+        "course_format": {
+            "required": enforce_formal_course_format,
+            "body_runs_checked": len(formal_body_runs),
+            "body_runs_9pt_microsoft_yahei": formal_body_format_ok,
+            "table_runs_checked": len(formal_table_runs),
+            "table_runs_9pt_microsoft_yahei": formal_table_format_ok,
+            "caption_style_9pt_microsoft_yahei": formal_caption_format_ok,
+        },
     }
 
 
@@ -505,30 +568,35 @@ def write_artifact_manifest(root: Path = ROOT, output: Path | None = None) -> di
 
 def inspect_rendered_pdfs(root: Path = ROOT) -> dict:
     specs = (
-        (root / "qa" / "rendered" / "formal" / FORMAL_PDF.name, 2, "formal"),
-        (root / "qa" / "rendered" / "full" / FULL_PDF.name, 7, "full_draft"),
+        (root / "qa" / "rendered" / "formal" / FORMAL_PDF.name, 1, 2, "formal"),
+        (root / "qa" / "rendered" / "full" / FULL_PDF.name, 1, None, "full_draft"),
     )
     documents: dict[str, dict[str, int | str | bool | None]] = {}
     present = 0
     failed = False
-    for path, expected_pages, label in specs:
+    for path, minimum_pages, maximum_pages, label in specs:
+        page_rule = (
+            f"{minimum_pages}-{maximum_pages}"
+            if maximum_pages is not None
+            else f">={minimum_pages}"
+        )
         if not path.exists():
             documents[label] = {
                 "status": "not_run",
                 "rendered_pages": None,
-                "expected_pages": expected_pages,
+                "page_rule": page_rule,
                 "page_count_ok": None,
             }
             continue
         present += 1
         try:
             pages = len(PdfReader(str(path)).pages)
-            ok = pages == expected_pages
+            ok = pages >= minimum_pages and (maximum_pages is None or pages <= maximum_pages)
             failed = failed or not ok
             documents[label] = {
                 "status": "passed" if ok else "failed",
                 "rendered_pages": pages,
-                "expected_pages": expected_pages,
+                "page_rule": page_rule,
                 "page_count_ok": ok,
             }
         except Exception as exc:  # corrupt or unreadable optional render evidence
@@ -536,7 +604,7 @@ def inspect_rendered_pdfs(root: Path = ROOT) -> dict:
             documents[label] = {
                 "status": "failed",
                 "rendered_pages": None,
-                "expected_pages": expected_pages,
+                "page_rule": page_rule,
                 "page_count_ok": False,
                 "error": type(exc).__name__,
             }
@@ -567,7 +635,7 @@ def read_manual_visual_receipt(root: Path = ROOT) -> dict:
         "reviewed_at": receipt.get("reviewed_at"),
         "reviewer": receipt.get("reviewer"),
         "documents": receipt.get("documents", []),
-        "note": "Human-authored receipt; not inferred by verify_project.py.",
+        "note": "Explicit reviewer receipt; not inferred by verify_project.py.",
     }
 
 
@@ -578,11 +646,19 @@ def run_checks(root: Path = ROOT, *, include_visual: bool = False) -> dict:
     core_metrics = check_core_metrics(root)
     formal_path = root / "reports" / "public" / FORMAL.name
     full_path = root / "reports" / "public" / FULL.name
-    formal = inspect_docx(formal_path, expected_images=1)
-    full = inspect_docx(full_path, expected_images=2)
-    if not formal.get("thesis_paragraph_bold", False):
-        formal.setdefault("errors", []).append("conclusion_first_paragraph_not_bold")
-        formal["status"] = "failed"
+    formal = inspect_docx(
+        formal_path,
+        expected_images=1,
+        expected_normal_font="Microsoft YaHei",
+        expected_normal_size_half_points=18,
+        enforce_formal_course_format=True,
+    )
+    full = inspect_docx(
+        full_path,
+        expected_images=2,
+        expected_normal_font="宋体",
+        expected_normal_size_half_points=24,
+    )
     pii = scan_public_pii(root)
     artifacts = write_artifact_manifest(root)
 

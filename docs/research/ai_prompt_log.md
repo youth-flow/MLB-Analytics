@@ -17,7 +17,7 @@
 
 - 用户补充：绑定 GitHub 远程仓库并阶段性推送。
 - AI 工作：建立 `main` 分支并绑定 `https://github.com/youth-flow/MLB-Analytics.git`；下载并留存 MLB StatsAPI、Baseball Savant、NPB 官方和 NPB Basement 快照；为每个原始文件计算 SHA-256。
-- 异常记录：两次 `git push` 受到外部网络连接失败影响；本地提交和远程绑定均正常保留，后续节点继续重试。
+- 版本记录：仓库建立 `main` 分支并绑定远程；早期推送曾遇到网络连接失败，连接恢复后已完成阶段性推送。每次交付前仍以本地`git status`和远程跟踪分支状态为准。
 
 ## 步骤 4：第一轮诊断
 
@@ -41,5 +41,6 @@
 
 ## 步骤 7：成稿与质量控制
 
-- AI 工作：生成两页正式文稿和完整分析底稿；使用固定版式、Word 原生表格和图表；将两个 DOCX 渲染为逐页 PNG 检查页数、溢出、字体、表格与分页；形成复现与完整性报告。
+- AI 工作：生成两页正式文稿和完整分析底稿；正式稿按 A4、不超过两页、正文/表格/图注 9pt 微软雅黑、首段整段加粗的课程格式构建，完整底稿使用朴素宋体版式；自动检查来源哈希、数据闭合、核心结论、文档结构与公开版隐私。
+- 证据边界：自动流水线只证明可重建与结构检查通过，不等于人工视觉验收。DOCX 仍需渲染为逐页图片检查页数、溢出、字体、表格和分页；在真实检查完成并写入独立记录之前，`submission_ready`必须保持为`false`。
 - 人工可复核入口：`README.md`、`data/raw/source_manifest.csv`、`qa/data_reconciliation.csv`、`docs/research/analysis_cycle_results.md`、`scripts/` 和 `reports/`。

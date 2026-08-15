@@ -5,14 +5,20 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from pypdf import PdfWriter
+
 from scripts.verify_project import (
     EXPECTED_CORE_METRICS,
     EXPECTED_RECONCILIATION,
+    FORMAL,
+    FULL,
     ROOT,
     build_artifact_manifest_bytes,
     check_core_metrics,
     check_data_reconciliation,
     check_source_manifest,
+    inspect_docx,
+    inspect_rendered_pdfs,
     scan_public_pii,
     write_artifact_manifest,
 )
@@ -37,8 +43,56 @@ class FrozenProjectTests(unittest.TestCase):
         for key, expected in EXPECTED_CORE_METRICS.items():
             self.assertAlmostEqual(float(result["observed"][key]), float(expected), places=8)
 
+    def test_public_docx_typography_contracts(self) -> None:
+        formal = inspect_docx(
+            FORMAL,
+            expected_images=1,
+            expected_normal_font="Microsoft YaHei",
+            expected_normal_size_half_points=18,
+            enforce_formal_course_format=True,
+        )
+        self.assertEqual(formal["status"], "passed", formal["errors"])
+        self.assertTrue(formal["thesis_paragraph_bold"])
+        self.assertTrue(formal["course_format"]["body_runs_9pt_microsoft_yahei"])
+        self.assertTrue(formal["course_format"]["table_runs_9pt_microsoft_yahei"])
+        self.assertTrue(formal["course_format"]["caption_style_9pt_microsoft_yahei"])
+
+        full = inspect_docx(
+            FULL,
+            expected_images=2,
+            expected_normal_font="宋体",
+            expected_normal_size_half_points=24,
+        )
+        self.assertEqual(full["status"], "passed", full["errors"])
+
 
 class VerificationMechanismTests(unittest.TestCase):
+    @staticmethod
+    def _write_blank_pdf(path: Path, pages: int) -> None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        writer = PdfWriter()
+        for _ in range(pages):
+            writer.add_blank_page(width=595, height=842)
+        with path.open("wb") as handle:
+            writer.write(handle)
+
+    def test_render_page_policy_matches_course_limit(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            formal = root / "qa" / "rendered" / "formal" / "今井达也_MLB调整决策_正式文稿.pdf"
+            full = root / "qa" / "rendered" / "full" / "今井达也_MLB调整决策_完整分析底稿.pdf"
+            self._write_blank_pdf(formal, 2)
+            self._write_blank_pdf(full, 9)
+            result = inspect_rendered_pdfs(root)
+            self.assertEqual(result["status"], "passed")
+            self.assertEqual(result["documents"]["formal"]["page_rule"], "1-2")
+            self.assertEqual(result["documents"]["full_draft"]["page_rule"], ">=1")
+
+            self._write_blank_pdf(formal, 3)
+            result = inspect_rendered_pdfs(root)
+            self.assertEqual(result["status"], "failed")
+            self.assertFalse(result["documents"]["formal"]["page_count_ok"])
+
     def test_manifest_is_deterministic_and_excludes_transients(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
