@@ -1,5 +1,9 @@
 # 换电脑恢复项目
 
+## 最新两份提交文件
+
+2026-09-11 定稿的 15 页实习报告与 2 页蒋总汇总保存在 [`final_submission/`](final_submission/)。本次只提交该目录中的两个 Word，不需要底稿。原图、源文与最新排版检查随 `_source/` 保存；历史周记及旧版本仍保留在 `workspace_backup/`，没有覆盖已提交的第一、二周记录。
+
 在新电脑安装 Git 后执行：
 
 ```powershell
@@ -28,7 +32,7 @@ py -3.12 -m venv .venv
 
 经本人确认，包含姓名、学号及港科暑研内容的提交材料也已收入 `workspace_backup/`：
 
-- `workspace_backup/提交材料/`：四周实习记录、实习报告、蒋总两页汇总、四份底稿及提交文件哈希清单。正式提交请取此目录中的文件。
+- `workspace_backup/提交材料/`：四周实习记录、历史实习报告、蒋总两页汇总、四份底稿及提交文件哈希清单。周记继续取此处；本次最新报告和蒋总稿改取上方 `final_submission/`。
 - `workspace_backup/` 根目录：课程 PDF、实习要求及四份学校表格原文件。
 - `workspace_backup/.submission_revision_work/`：文稿源文件、自编生成与核查脚本、历史版本、图表、PDF 和逐页排版预览。此处保留了工作过程，可能有过期候选稿；正式版本以上一项目录为准。
 - `workspace_backup/BACKUP_MANIFEST.json`：每个备份文件的相对路径、字节数和 SHA-256，以及未上传的软件运行库与缓存清单。

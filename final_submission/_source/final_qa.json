@@ -1,0 +1,28 @@
+{
+  "review_date": "2026-09-11",
+  "renderer": "Microsoft Word COM, exported PDF, pdftoppm at 120 dpi",
+  "style": "A4; report 12 pt SimSun, 18.5 pt fixed line spacing; executive 9 pt Microsoft YaHei, 14 pt fixed line spacing",
+  "scope": "Two DOCX deliverables only. MLB frozen through 2026-08-12. HKUST summer stage complete. No implemented team intervention or statistical significance claimed.",
+  "results": [
+    {
+      "file": "实习报告_杨炎新_15页.docx",
+      "sha256": "19c9739cf7a53d8dbf2dc1973d6e78a141a1b9021dc685ff35bb280aeb154be5",
+      "bytes": 19629550,
+      "word_pdf_pages": 15,
+      "tables": 8,
+      "embedded_images": 8,
+      "visual_review": "Not inferred by this script. See the separately recorded, hash-bound VISUAL_REVIEW.md.",
+      "pdf_sha256": "fc08958eeb308be73a5c20dbf4eae0253ff213f5157b0ef71ca3756bffceb733"
+    },
+    {
+      "file": "蒋总汇总_今井达也MLB调整建议_2页.docx",
+      "sha256": "36e56c8acdbc262db4495d4338f722457eb6a25b3cc2b232e693ccc8aeace3eb",
+      "bytes": 41779,
+      "word_pdf_pages": 2,
+      "tables": 2,
+      "embedded_images": 0,
+      "visual_review": "Not inferred by this script. See the separately recorded, hash-bound VISUAL_REVIEW.md.",
+      "pdf_sha256": "6c3299bf4b7111523ddf98b3629147401dfaf0bf5cec8a9cfa8805b80d9a4c93"
+    }
+  ]
+}
