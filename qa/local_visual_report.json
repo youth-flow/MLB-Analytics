@@ -1,0 +1,232 @@
+{
+  "report_schema_version": 2,
+  "verification_scope": {
+    "mode": "offline_frozen",
+    "data_cutoff": "2026-08-12"
+  },
+  "automatic_verification": {
+    "source_manifest": {
+      "status": "passed",
+      "entries": 17,
+      "errors": []
+    },
+    "data_reconciliation": {
+      "status": "passed",
+      "rows": [
+        {
+          "check": "Statcast pitch rows",
+          "computed": 1240,
+          "reference": 1240,
+          "difference": 0
+        },
+        {
+          "check": "Strikeouts",
+          "computed": 80,
+          "reference": 80,
+          "difference": 0
+        },
+        {
+          "check": "Walks",
+          "computed": 42,
+          "reference": 42,
+          "difference": 0
+        },
+        {
+          "check": "Games",
+          "computed": 17,
+          "reference": 17,
+          "difference": 0
+        }
+      ],
+      "errors": []
+    },
+    "core_metrics": {
+      "status": "passed",
+      "observed": {
+        "games": 17,
+        "starts": 15,
+        "relief_appearances": 2,
+        "innings": 64.66666666666667,
+        "k_pct": 27.77777777777778,
+        "bb_pct": 14.583333333333334,
+        "npb_2025_changeup_usage_pct": 12.67,
+        "mlb_changeup_usage_pct": 2.338709677419355,
+        "four_seam_lhb_rv100": -1.2720257234726688,
+        "four_seam_rhb_rv100": 1.465065502183406,
+        "relief_plate_appearances": 23
+      },
+      "errors": []
+    },
+    "formal_docx": {
+      "path": "reports/public/今井达也_MLB调整决策_正式文稿.docx",
+      "present": true,
+      "status": "passed",
+      "errors": [],
+      "a4_geometry": true,
+      "page_sizes_twips": [
+        {
+          "width": 11906,
+          "height": 16838
+        }
+      ],
+      "contains_title": true,
+      "normal_style_chinese_fonts": [
+        "Microsoft YaHei"
+      ],
+      "normal_style_sizes_half_points": [
+        "18"
+      ],
+      "plain_style": true,
+      "plain_style_evidence": {
+        "direct_nonblack_text_colors": [],
+        "nonwhite_shading_fills": [
+          "D9D9D9"
+        ],
+        "page_backgrounds": 0,
+        "page_borders": 0,
+        "legacy_shapes": 0
+      },
+      "embedded_images": 1,
+      "expected_images_at_least": 1,
+      "thesis_paragraph_bold": true,
+      "course_format": {
+        "required": true,
+        "body_runs_checked": 8,
+        "body_runs_9pt_microsoft_yahei": true,
+        "table_runs_checked": 15,
+        "table_runs_9pt_microsoft_yahei": true,
+        "caption_style_9pt_microsoft_yahei": true
+      }
+    },
+    "full_draft_docx": {
+      "path": "reports/public/今井达也_MLB调整决策_完整分析底稿.docx",
+      "present": true,
+      "status": "passed",
+      "errors": [],
+      "a4_geometry": true,
+      "page_sizes_twips": [
+        {
+          "width": 11906,
+          "height": 16838
+        }
+      ],
+      "contains_title": true,
+      "normal_style_chinese_fonts": [
+        "宋体"
+      ],
+      "normal_style_sizes_half_points": [
+        "24"
+      ],
+      "plain_style": true,
+      "plain_style_evidence": {
+        "direct_nonblack_text_colors": [],
+        "nonwhite_shading_fills": [
+          "D9D9D9"
+        ],
+        "page_backgrounds": 0,
+        "page_borders": 0,
+        "legacy_shapes": 0
+      },
+      "embedded_images": 2,
+      "expected_images_at_least": 2,
+      "thesis_paragraph_bold": false,
+      "course_format": {
+        "required": false,
+        "body_runs_checked": 94,
+        "body_runs_9pt_microsoft_yahei": false,
+        "table_runs_checked": 68,
+        "table_runs_9pt_microsoft_yahei": false,
+        "caption_style_9pt_microsoft_yahei": false
+      }
+    },
+    "public_pii_scan": {
+      "status": "passed",
+      "files_scanned": 24,
+      "findings": []
+    },
+    "artifact_manifest": {
+      "status": "passed",
+      "entries": 45,
+      "manifest_sha256": "eb118f81b8fa3edf3965ae4ac67fcff76ac9eeeda9411a96243e5c2dc505d373",
+      "excluded_path_leaks": [],
+      "deterministic_order": true
+    },
+    "overall_pass": true
+  },
+  "render_verification": {
+    "status": "passed",
+    "documents": {
+      "formal": {
+        "status": "passed",
+        "rendered_pages": 2,
+        "page_rule": "1-2",
+        "page_count_ok": true
+      },
+      "full_draft": {
+        "status": "passed",
+        "rendered_pages": 10,
+        "page_rule": ">=1",
+        "page_count_ok": true
+      }
+    }
+  },
+  "manual_visual_qa": {
+    "status": "reviewed",
+    "reviewed_at": "2026-08-15T14:57:45+08:00",
+    "reviewer": "Codex（逐页原始分辨率视觉核查）",
+    "documents": [
+      {
+        "path": "reports/public/今井达也_MLB调整决策_正式文稿.docx",
+        "docx_sha256": "96511A9F91DDD512C98F79D0C12936B7B021A9DD5208829872D73D7684AF0C30",
+        "rendered_pdf": "qa/rendered/formal/今井达也_MLB调整决策_正式文稿.pdf",
+        "pdf_sha256": "8213BD42C5116D97393FD8923A431B126288D5FB927FD9D029A26E7BBD237DEC",
+        "pages": 2,
+        "pages_reviewed": [
+          1,
+          2
+        ],
+        "checks": {
+          "no_clipping_or_overlap": true,
+          "tables_and_figure_readable": true,
+          "font_rendering_normal": true,
+          "page_breaks_acceptable": true,
+          "course_two_page_limit_met": true
+        }
+      },
+      {
+        "path": "reports/public/今井达也_MLB调整决策_完整分析底稿.docx",
+        "docx_sha256": "CD2EB93E95F7A6A8E0FF8A6FEA798A5485E3FCC2EEDE83615F3707903AA4B1DF",
+        "rendered_pdf": "qa/rendered/full/今井达也_MLB调整决策_完整分析底稿.pdf",
+        "pdf_sha256": "5FFF9750EA80DA6B78873824B93F3ED196BA274C84E3244A5C59F2E608532F64",
+        "pages": 10,
+        "pages_reviewed": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "checks": {
+          "no_clipping_or_overlap": true,
+          "tables_and_figures_readable": true,
+          "font_rendering_normal": true,
+          "page_breaks_acceptable": true,
+          "orphan_source_page_removed": true
+        }
+      }
+    ],
+    "note": "Explicit reviewer receipt; not inferred by verify_project.py."
+  },
+  "overall_pass": true,
+  "submission_ready": true,
+  "evidence_policy": {
+    "clean_clone_can_pass_without_rendering": true,
+    "rendering_is_automatic_page_count_evidence_only": true,
+    "manual_visual_claims_are_never_inferred": true
+  }
+}
