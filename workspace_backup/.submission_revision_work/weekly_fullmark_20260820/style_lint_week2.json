@@ -1,0 +1,70 @@
+{
+  "input": "C:\\Users\\yyx\\Desktop\\\u5927\u4e09\u6691\u671f\u77ed\u5b66\u671f\\.submission_revision_work\\weekly_fullmark_20260820\\output\\\u7b2c2\u5468\u5b9e\u4e60\u8bb0\u5f55.docx",
+  "fonts_by_char_count": {
+    "\u4eff\u5b8b_GB2312": 1500,
+    "\u65b9\u6b63\u5c0f\u6807\u5b8b\u7b80\u4f53": 7
+  },
+  "direct_run_formatting_runs": 27,
+  "direct_paragraph_formatting_paragraphs": 13,
+  "heading_like_paragraphs_not_heading_style": [],
+  "examples": {
+    "direct_paragraph_formatting": [
+      {
+        "para_index": 1,
+        "text": "\u7b2c2\u5468\u5b9e\u4e60\u8bb0\u5f55",
+        "style": "Normal"
+      },
+      {
+        "para_index": 2,
+        "text": "",
+        "style": "Normal"
+      },
+      {
+        "para_index": 17,
+        "text": "MLB\u9879\u76ee\u5df2\u7ecf\u56fa\u5b9a\u6570\u636e\u6765\u6e90\uff0c\u8bb0\u5f55\u5f02\u5e38\uff0c\u5e76\u5b8c\u6210\u4e3b\u8981\u6307\u6807\u4e0e\u5b98\u65b9\u6570\u636e\u7684\u6838\u5bf9\u3002",
+        "style": "List Bullet"
+      },
+      {
+        "para_index": 18,
+        "text": "\u6e2f\u79d1\u9879\u76ee\u5b8c\u6210reward utility\u3001policy regret\u3001\u5956\u52b1\u7b49\u4ef7\u7c7b\u548c\u5c40\u90e8Fisher\u51e0\u4f55\u7684\u4e3b\u4f53\u63a8\u5bfc\u3002",
+        "style": "List Bullet"
+      },
+      {
+        "para_index": 19,
+        "text": "\u4e0b\u4e00\u5468\u5c06\u6309\u63a7\u7403\u3001\u7403\u79cd\u3001\u5de6\u53f3\u6253\u548c\u89d2\u8272\u62c6\u5206\u68d2\u7403\u6570\u636e\uff0c\u540c\u65f6\u5728HPC4\u4e0a\u6d4b\u8bd5\u6570\u636e\u751f\u6210\u3001\u5956\u52b1\u8bad\u7ec3\u548c\u7b56\u7565\u8bc4\u4ef7\u6d41\u7a0b\u3002",
+        "style": "List Bullet"
+      }
+    ],
+    "direct_run_formatting": [
+      {
+        "para_index": 1,
+        "run_text": "\u7b2c2\u5468\u5b9e\u4e60\u8bb0\u5f55",
+        "style": "Normal"
+      },
+      {
+        "para_index": 3,
+        "run_text": "\u4e00\u3001\u9636\u6bb5\u4e3b\u8981\u4efb\u52a1",
+        "style": "Heading 1"
+      },
+      {
+        "para_index": 4,
+        "run_text": "\u672c\u5468\u6ca1\u6709\u6025\u7740\u753b\u56fe\uff0c\u800c\u662f\u5148\u628a\u6570\u636e\u6574\u7406\u5230\u80fd\u591f\u53cd\u590d\u6838\u5bf9\u7684\u72b6\u6001\u3002\u6211\u628a\u539f\u59cb\u7f51\u9875\u3001JSON\u548cCSV\u51bb\u7ed3\u4e3a\u672c\u5730\u5feb\u7167\uff0c\u8bb0\u5f55\u6765\u6e90\u5730\u5740\u3001\u4e0b\u8f7d\u65f6\u95f4\u3001\u6587\u4ef6\u5927\u5c0f\u548cSHA-256\uff0c\u540e\u7eed\u5206\u6790",
+        "style": "Normal"
+      },
+      {
+        "para_index": 5,
+        "run_text": "\u6574\u7406\u65f6\uff0c\u6211\u628a\u6570\u636e\u5206\u4e3a\u6bd4\u8d5b\u3001\u6253\u5e2d\u548c\u9010\u7403\u4e09\u5c42\u3002StatsAPI\u7528\u4e8e\u6838\u5bf9\u573a\u6b21\u3001\u5148\u53d1\u6216\u725b\u68da\u8eab\u4efd\u3001\u5c40\u6570\u3001\u4e09\u632f\u548c\u4fdd\u9001\uff1bStatcast\u7528\u4e8e\u5206\u6790\u7403\u79cd\u3001\u4f4d\u7f6e\u3001\u7403\u6570\u3001\u6325\u68d2\u4e0e\u7ed3\u679c\uff1b",
+        "style": "Normal"
+      },
+      {
+        "para_index": 6,
+        "run_text": "\u4e8c\u3001\u4e00\u6b21\u5177\u4f53\u7684\u6570\u636e\u6e05\u6d17\u95ee\u9898",
+        "style": "Heading 1"
+      }
+    ]
+  },
+  "notes": [
+    "Direct formatting is not always wrong, but it often causes inconsistent output when templates change.",
+    "Heading-like paragraphs not using Heading styles can break TOC and accessibility."
+  ]
+}

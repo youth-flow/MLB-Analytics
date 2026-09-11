@@ -1,0 +1,34 @@
+{
+  "reference": "C:\\Users\\yyx\\Desktop\\大三暑期短学期\\.submission_revision_work\\archive\\weekly_before_fullmark_polish_20260820\\第1周实习记录_润色前.docx",
+  "reference_sha256": "07B267887710B0EF542D43EA1D6556CD4DA4D4BE6A83C9DFA967367F44BE0254",
+  "outputs": [
+    {
+      "source": "C:\\Users\\yyx\\Desktop\\大三暑期短学期\\.submission_revision_work\\sources\\01_week1.md",
+      "output": "C:\\Users\\yyx\\Desktop\\大三暑期短学期\\.submission_revision_work\\weekly_fullmark_20260820\\output\\第1周实习记录.docx",
+      "sha256": "2B0F58826C9FC2972A38E3AAF71EE0737386B8C45DE36140D666AC1BCF9639D8",
+      "visible_paragraphs": 19,
+      "characters": 1587
+    },
+    {
+      "source": "C:\\Users\\yyx\\Desktop\\大三暑期短学期\\.submission_revision_work\\sources\\02_week2.md",
+      "output": "C:\\Users\\yyx\\Desktop\\大三暑期短学期\\.submission_revision_work\\weekly_fullmark_20260820\\output\\第2周实习记录.docx",
+      "sha256": "C8F59F1C11DD0359E3857A791F83CD5EFAF8D647E73A57C55B5109FD9FFB4BAB",
+      "visible_paragraphs": 18,
+      "characters": 1455
+    },
+    {
+      "source": "C:\\Users\\yyx\\Desktop\\大三暑期短学期\\.submission_revision_work\\sources\\03_week3.md",
+      "output": "C:\\Users\\yyx\\Desktop\\大三暑期短学期\\.submission_revision_work\\weekly_fullmark_20260820\\output\\第3周实习记录.docx",
+      "sha256": "D0CE07E5391858CFC5FFD89253DA4EE8EEDDFF0476B840F3FA889A81E0FBA42F",
+      "visible_paragraphs": 20,
+      "characters": 1831
+    },
+    {
+      "source": "C:\\Users\\yyx\\Desktop\\大三暑期短学期\\.submission_revision_work\\sources\\04_week4.md",
+      "output": "C:\\Users\\yyx\\Desktop\\大三暑期短学期\\.submission_revision_work\\weekly_fullmark_20260820\\output\\第4周实习记录.docx",
+      "sha256": "FF326266B1F672F92AD20C591ED4BC21F271AE94F4BEC3DB5A6C8346C3C5B8E1",
+      "visible_paragraphs": 17,
+      "characters": 1529
+    }
+  ]
+}

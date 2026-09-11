@@ -12,3 +12,6 @@ data/raw/source_manifest.json -binary text eol=lf diff merge
 *.docx binary
 *.png binary
 *.pdf binary
+
+# Migration archive: preserve exact source bytes, including original line endings.
+workspace_backup/** -text
